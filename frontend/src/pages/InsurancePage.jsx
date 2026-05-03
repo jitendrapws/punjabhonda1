@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Loader2, CheckCircle2, ShieldCheck, FileText, Clock } from "lucide-react";
-import { submitEnquiry } from "../lib/api";
+import { submitEnquiry, fetchSiteSettings } from "../lib/api";
 
 export default function InsurancePage() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", city: "", vehicle_name: "", registration_number: "", policy_number: "", message: "" });
   const [status, setStatus] = useState({ loading: false, ok: false, err: "" });
+  const [settings, setSettings] = useState(null);
   const handle = (k) => (e) => setForm({ ...form, [k]: e.target.value });
+
+  useEffect(() => { fetchSiteSettings().then(setSettings).catch(() => {}); }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -15,14 +18,29 @@ export default function InsurancePage() {
     catch (e) { setStatus({ loading: false, ok: false, err: "Submission failed" }); }
   };
 
+  const bannerImg = settings?.insurance_banner_image;
+  const bannerTitle = settings?.insurance_banner_title || "Insurance Made Easy";
+  const bannerSubtitle = settings?.insurance_banner_subtitle || "Renew, claim, or buy new — Punjab Honda handles your two-wheeler insurance end-to-end.";
+
   return (
     <>
-      <section className="bg-gradient-to-br from-honda to-honda-dark text-white py-14" data-testid="insurance-hero">
+      {/* Full-bleed header banner */}
+      {bannerImg && (
+        <section className="relative h-[260px] sm:h-[340px] overflow-hidden" data-testid="insurance-header-banner">
+          <img src={bannerImg} alt="Insurance" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10" />
+          <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 h-full flex flex-col justify-end pb-12">
+            <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-honda">Two-Wheeler Insurance</div>
+            <h1 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter text-white mt-2 max-w-3xl leading-[0.95]">{bannerTitle}</h1>
+          </div>
+        </section>
+      )}
+
+      {/* Honda red strip with quick benefits */}
+      <section className="bg-gradient-to-br from-honda to-honda-dark text-white py-10" data-testid="insurance-benefits">
         <div className="max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div>
-            <div className="text-[11px] font-bold uppercase tracking-[0.2em] opacity-80">Buy Insurance Online</div>
-            <h1 className="font-display font-black text-4xl sm:text-5xl uppercase tracking-tighter mt-2">Insurance Made Easy</h1>
-            <p className="mt-3 opacity-90 max-w-md">Renew, claim, or buy new — Punjab Honda handles your two-wheeler insurance end-to-end.</p>
+            <p className="opacity-95 max-w-md text-base">{bannerSubtitle}</p>
           </div>
           <div className="grid grid-cols-3 gap-3">
             <Pill icon={ShieldCheck} title="100% Genuine" />
@@ -41,7 +59,7 @@ export default function InsurancePage() {
               <p className="text-gray-700 mt-2">Our insurance team will reach out within 24 hours with the best plan for you.</p>
             </div>
           ) : (
-            <form onSubmit={submit} className="border border-gray-200 p-8 space-y-5" data-testid="insurance-form">
+            <form onSubmit={submit} noValidate className="border border-gray-200 p-8 space-y-5" data-testid="insurance-form">
               <h2 className="font-display font-black text-2xl uppercase tracking-tight">Send your details</h2>
               <p className="text-sm text-gray-600 -mt-3">Fill the form — we'll call you with a tailored quote.</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
