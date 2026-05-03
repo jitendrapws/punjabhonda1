@@ -6,6 +6,7 @@ import Header from "./components/site/Header";
 import Footer from "./components/site/Footer";
 import EnquiryModal from "./components/site/EnquiryModal";
 import WhatsAppWidget from "./components/site/WhatsAppWidget";
+import ErrorBoundary from "./components/site/ErrorBoundary";
 
 import Home from "./pages/Home";
 import BikesListing from "./pages/BikesListing";
@@ -27,25 +28,27 @@ function App() {
 
   return (
     <div className="App min-h-screen flex flex-col">
-      <BrowserRouter>
-        <Header onOpenEnquiry={openEnquiry} />
-        <main className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home onOpenEnquiry={openEnquiry} />} />
-            <Route path="/bikes" element={<BikesListing onOpenEnquiry={openEnquiry} />} />
-            <Route path="/bikes/:slug" element={<BikeDetail onOpenEnquiry={openEnquiry} />} />
-            <Route path="/services" element={<ServicesPage onOpenEnquiry={openEnquiry} />} />
-            <Route path="/service-booking" element={<ServiceBookingPage />} />
-            <Route path="/insurance" element={<InsurancePage />} />
-            <Route path="/emi-calculator" element={<EmiCalculator onOpenEnquiry={openEnquiry} />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-          </Routes>
-        </main>
-        <Footer />
-        <EnquiryModal open={enquiry.open} onClose={closeEnquiry} type={enquiry.type} title={enquiry.title} vehicle={enquiry.vehicle} />
-        <WhatsAppWidget />
-      </BrowserRouter>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <Header onOpenEnquiry={openEnquiry} />
+          <main className="flex-1">
+            <Routes>
+              <Route path="/" element={<Home onOpenEnquiry={openEnquiry} />} />
+              <Route path="/bikes" element={<BikesListing onOpenEnquiry={openEnquiry} />} />
+              <Route path="/bikes/:slug" element={<BikeDetail onOpenEnquiry={openEnquiry} />} />
+              <Route path="/services" element={<ServicesPage onOpenEnquiry={openEnquiry} />} />
+              <Route path="/service-booking" element={<ServiceBookingPage />} />
+              <Route path="/insurance" element={<InsurancePage />} />
+              <Route path="/emi-calculator" element={<EmiCalculator onOpenEnquiry={openEnquiry} />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path="/admin" element={<AdminPage />} />
+            </Routes>
+          </main>
+          <Footer />
+          <EnquiryModal open={enquiry.open} onClose={closeEnquiry} type={enquiry.type} title={enquiry.title} vehicle={enquiry.vehicle} />
+          <WhatsAppWidget />
+        </BrowserRouter>
+      </ErrorBoundary>
     </div>
   );
 }

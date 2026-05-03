@@ -1,7 +1,15 @@
 import axios from "axios";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-export const API = `${BACKEND_URL}/api`;
+if (!BACKEND_URL) {
+  // eslint-disable-next-line no-console
+  console.error(
+    "[Punjab Honda] REACT_APP_BACKEND_URL is not set. " +
+    "On Netlify: Site settings → Environment variables → add REACT_APP_BACKEND_URL " +
+    "pointing to your backend (e.g. https://your-app.preview.emergentagent.com), then redeploy."
+  );
+}
+export const API = `${BACKEND_URL || ""}/api`;
 
 export const api = axios.create({ baseURL: API });
 
