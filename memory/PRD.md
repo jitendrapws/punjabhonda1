@@ -49,6 +49,20 @@ Use Punjab Honda's actual content (Honda Motorcycle & Scooter India authorized d
 - ✅ Replaced array-index `key` with stable identifiers (slide.tag, branch.name, testimonial.name, service.title, etc.) across HeroSlider, ShowroomSection, Testimonials, ServicesPage, ServicesSection.
 - ✅ `useMemo` added for table row rendering in admin dashboard.
 
+## CMS Upgrade (2026-01)
+- ✅ **Cloudinary integration** (signed uploads via backend, real account `dmtuyrkwy` verified end-to-end)
+- ✅ All static seed data (bikes, branches, hero slides, testimonials, services, site settings) **migrated to MongoDB** via idempotent `_seed_collection()` on app startup
+- ✅ Generic CRUD endpoints under `/api/admin/{resource}` (GET/POST/PATCH/DELETE) for: bikes, hero-slides, branches, testimonials, services
+- ✅ Site settings doc: brand name, phones, email, social links, insurance banner image/title/subtitle
+- ✅ **Admin panel now has 7 tabs**: Enquiries (existing) + **Bikes / Hero Slides / Branches / Testimonials / Services / Site Settings** — full content management
+- ✅ Reusable `CrudManager` component (table + drawer modal + image uploader)
+- ✅ `ImageUploader` component (signed Cloudinary upload + URL paste fallback + preview)
+- ✅ Insurance page **full-bleed header banner** wired to settings (admin-editable image, title, subtitle)
+- ✅ Mini-KPI cards in Enquiries panel for Service Bookings / Insurance / AMC / On-Road Quotes (user request: "i can see amc request, service request etc")
+- ✅ Enquiries table now includes a **Message** column
+- ✅ Public homepage components (HeroSlider, Testimonials, ServicesSection) now load from API — fully editable from admin
+- ✅ Tests: 57/57 backend pytest pass (33 original + 24 new CMS tests). Frontend: 100% on all CMS flows.
+
 ## Test Credentials
 - Admin Token: `punjab-honda-admin-2026` (login at `/admin`)
 
