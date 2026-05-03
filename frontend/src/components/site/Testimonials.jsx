@@ -15,11 +15,11 @@ export default function Testimonials() {
           <h2 className="font-display font-black text-3xl sm:text-4xl uppercase tracking-tight mt-2">What Our Riders Say</h2>
         </div>
         <div className="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
-          {items.map((t, i) => (
-            <div key={i} className="border border-gray-200 p-8 bg-white relative" data-testid={`testimonial-${i}`}>
+          {items.map((t) => (
+            <div key={t.name} className="border border-gray-200 p-8 bg-white relative" data-testid={`testimonial-${t.name.toLowerCase().replace(/\s+/g, '-')}`}>
               <Quote className="w-10 h-10 text-honda/20 absolute top-6 right-6" />
               <div className="flex gap-1 mb-4">
-                {Array(t.rating).fill(0).map((_, j) => <Star key={j} className="w-4 h-4 fill-honda text-honda" />)}
+                {Array.from({ length: t.rating }, (_, j) => <Star key={`star-${t.name}-${j}`} className="w-4 h-4 fill-honda text-honda" />)}
               </div>
               <p className="text-gray-700 text-sm leading-relaxed">"{t.text}"</p>
               <div className="mt-6 pt-5 border-t border-gray-100 font-display font-bold">{t.name}</div>

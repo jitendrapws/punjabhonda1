@@ -43,7 +43,7 @@ export default function HeroSlider() {
   return (
     <section className="relative h-[520px] sm:h-[600px] bg-gray-950 overflow-hidden" data-testid="hero-slider">
       {slides.map((s, i) => (
-        <div key={i} className={`slider-slide ${i === idx ? "active" : ""}`} aria-hidden={i !== idx}>
+        <div key={s.tag} className={`slider-slide ${i === idx ? "active" : ""}`} aria-hidden={i !== idx}>
           <img src={s.image} alt="" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/30" />
           <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 h-full flex items-center">
@@ -57,7 +57,7 @@ export default function HeroSlider() {
               </h1>
               <p className="mt-5 text-base sm:text-lg text-gray-200 max-w-xl">{s.subtitle}</p>
               <div className="mt-3 font-mono text-honda text-sm tracking-wider">{s.accent}</div>
-              <Link to={s.ctaLink} className="mt-8 inline-flex items-center gap-2 bg-honda px-7 py-4 text-sm font-bold uppercase tracking-wider hover:bg-honda-dark transition-colors" data-testid={`hero-cta-${i}`}>
+              <Link to={s.ctaLink} className="mt-8 inline-flex items-center gap-2 bg-honda px-7 py-4 text-sm font-bold uppercase tracking-wider hover:bg-honda-dark transition-colors" data-testid={`hero-cta-${s.tag.toLowerCase().replace(/\s+/g, '-')}`}>
                 {s.cta} <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -67,9 +67,9 @@ export default function HeroSlider() {
 
       {/* Dots */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2">
-        {slides.map((_, i) => (
+        {slides.map((s, i) => (
           <button
-            key={i}
+            key={s.tag}
             onClick={() => setIdx(i)}
             className={`h-1 transition-all ${i === idx ? "w-10 bg-honda" : "w-5 bg-white/50"}`}
             aria-label={`Slide ${i + 1}`}

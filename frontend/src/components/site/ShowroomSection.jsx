@@ -17,8 +17,8 @@ export default function ShowroomSection() {
           <div className="text-sm text-gray-600">Serving Ahmedabad and Gujarat since 2012</div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-          {branches.map((b, i) => (
-            <div key={i} className="bg-white border border-gray-200 p-6 flex flex-col hover:border-honda transition-colors" data-testid={`branch-${i}`}>
+          {branches.map((b) => (
+            <div key={b.name} className="bg-white border border-gray-200 p-6 flex flex-col hover:border-honda transition-colors" data-testid={`branch-${b.name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
               <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-honda">{b.type.replace("_", " + ")}</div>
               <h3 className="font-display font-bold text-lg mt-2">{b.name}</h3>
               <div className="flex gap-2 mt-4 text-sm text-gray-600">

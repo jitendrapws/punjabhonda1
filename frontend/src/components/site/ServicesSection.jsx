@@ -26,8 +26,8 @@ export default function ServicesSection() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-px bg-gray-800">
-          {services.map((s, i) => (
-            <div key={i} className="bg-gray-950 p-7 group hover:bg-gray-900 transition-colors flex flex-col" data-testid={`service-${i}`}>
+          {services.map((s) => (
+            <div key={s.title} className="bg-gray-950 p-7 group hover:bg-gray-900 transition-colors flex flex-col" data-testid={`service-${s.title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
               <div className="w-12 h-12 border border-gray-700 flex items-center justify-center group-hover:border-honda group-hover:bg-honda transition-colors">
                 <s.icon className="w-6 h-6" />
               </div>

@@ -1,0 +1,38 @@
+{
+  "summary": "Frontend regression after refactor. Tested all 17 requested flows via Playwright against public REACT_APP_BACKEND_URL. 16/17 pass. One caveat: the NEW custom email validation in useEnquiryForm.js is dead code because the <input type='email'> triggers HTML5 native validation first and blocks form submission before React's validate() ever runs — the user sees the browser's native tooltip ('Please include an @...') instead of the app's 'Invalid email' error as specified in the review request. All other refactors verified: sessionStorage persistence across reload, sessionStorage cleanup on logout, optimistic status update (row reflects new value immediately while API call is artificially slowed via route interception), filter dropdowns reload, vehicle 'For: <bike>' header, required-field validation, modal reset on close+reopen, success-state reset on reopen, all page forms submit, EMI sliders, bike tabs, hero dots, mobile menu, 3 BikeDetail CTAs.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "EnquiryModal / useEnquiryForm",
+        "issue": "Custom 'Invalid email' validation never fires for obviously-invalid input like 'abc'. The <input type=\"email\"> triggers HTML5 native validation which blocks the form submit before React's useEnquiryForm.validate() runs. Review request explicitly asked this flow to display 'Invalid email'; instead user sees the browser's native tooltip 'Please include an @ in the email address'. The custom regex branch in useEnquiryForm.js:42 is effectively dead code.",
+        "selector": "[data-testid='enquiry-email-input']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": []
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_punjab_honda.py (backend regression from iteration_1)",
+    "/app/test_reports/iteration_2.json (previous frontend pass)"
+  ],
+  "action_items": [
+    "In EnquiryModal.jsx (or the shared Field component), change the email input from type='email' to type='text' OR add the noValidate attribute to the <form> in EnquiryFormBody so React's custom email validation runs. After the change, entering 'abc' in the email field and submitting should render 'Invalid email' inside [data-testid='enquiry-error'] as expected by the review request."
+  ],
+  "critical_code_review_comments": [
+    "useEnquiryForm.js:42 — email validation regex is unreachable while the input is type='email' (HTML5 native validation intercepts). Either drop type='email' or add noValidate on the form.",
+    "useAdminAuth.js:53 — useEffect has `eslint-disable-next-line react-hooks/exhaustive-deps` so it only runs once on mount. Acceptable for the silent-verify-on-mount pattern, but worth a comment explaining why token/clear aren't deps (would cause re-verify on every clear()).",
+    "AdminPage.jsx: optimistic update logic is clean. On failure it calls load() which refetches everything rather than reverting just the one row; minor but fine for MVP scale.",
+    "EnquiryModal.jsx:119 — reset() is called whenever `open` or `vehicle` changes. If the user closes mid-submit, the in-flight request still resolves and setSuccess(true) runs on a hidden modal; harmless (modal is unmounted) but on next open it is reset by the effect so no stale state leaks. Verified by the close+reopen test.",
+    "EnquiryModal.jsx and ServiceBookingPage both hardcode the same BRANCHES list of 4 branches; consider pulling from /api or a shared constant to avoid drift."
+  ],
+  "updated_files": [],
+  "success_rate": { "backend": "100% (33/33 from iteration_1, not re-run)", "frontend": "94% (16/17 requested flows — email-validation flow fails as specified above)" },
+  "test_credentials": "Admin token: punjab-honda-admin-2026",
+  "seed_data_creation": "Submitted TEST_-prefixed enquiries during E2E (product_enquiry on cb200x, service_booking for Ashram Road on 2026-06-15, insurance, contact). One row's status was optimistically toggled new→contacted.",
+  "retest_needed": true,
+  "should_main_agent_self_test": true,
+  "context_for_next_testing_agent": "All testids from iteration_2 still valid. Admin dashboard now uses sessionStorage (not localStorage) under key 'ph_admin_token'. Admin login flow: verify API is POST /api/admin/verify with Bearer token; on failure useAdminAuth.verify() returns false and LoginForm shows 'Invalid token'. Optimistic update test requires intercepting /api/admin/enquiries/** with a small delay (see iteration_3 playwright script) to visually confirm row updates BEFORE the API resolves. EnquiryModal email validation: as of now, HTML5 native validation blocks 'abc' submission; after main agent's fix re-test by entering 'abc' and expecting [data-testid='enquiry-error'] to read 'Invalid email'.",
+  "rca_of_the_issue": "Bug: 'Invalid email' custom error never appears. Repro: Open any EnquiryModal, fill name+phone, type 'abc' in email, click Submit. Expected: React renders <div data-testid='enquiry-error'>Invalid email</div>. Actual: Browser shows native validity tooltip; form submit is aborted before React's onSubmit fires so useEnquiryForm.validate() never runs. Root cause: The email input is declared type='email' in EnquiryModal.jsx Field component, and the outer <form> does not set noValidate, so HTML5 constraint validation runs first. Fix: either (a) pass type='text' instead of type='email' for the email Field in EnquiryFormBody, or (b) add noValidate to the <form> element in EnquiryFormBody so React's custom validator is the sole gatekeeper."
+}

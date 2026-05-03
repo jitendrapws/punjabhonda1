@@ -20,7 +20,21 @@ if not BASE_URL:
         pass
 
 API = f"{BASE_URL}/api"
-ADMIN_TOKEN = "punjab-honda-admin-2026"
+
+# Load admin token from backend .env or environment (no hardcoded secret)
+ADMIN_TOKEN = os.environ.get('ADMIN_TOKEN', '')
+if not ADMIN_TOKEN:
+    try:
+        with open('/app/backend/.env') as f:
+            for line in f:
+                if line.startswith('ADMIN_TOKEN='):
+                    ADMIN_TOKEN = line.split('=', 1)[1].strip().strip('"')
+                    break
+    except Exception:
+        pass
+if not ADMIN_TOKEN:
+    raise RuntimeError("ADMIN_TOKEN not configured. Set env var or /app/backend/.env entry.")
+
 ADMIN_HEADERS = {"X-Admin-Token": ADMIN_TOKEN}
 
 

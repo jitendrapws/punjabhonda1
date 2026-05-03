@@ -25,8 +25,8 @@ export default function ServicesPage({ onOpenEnquiry }) {
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
           <h2 className="font-display font-black text-3xl uppercase tracking-tight">Why Punjab Honda Service</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-            {["Honda-trained technicians", "100% genuine spares", "Transparent pricing", "Same-day delivery", "Free pickup/drop within 5 km", "Real-time service status SMS"].map((t, i) => (
-              <div key={i} className="border border-gray-200 p-6 flex gap-3" data-testid={`why-${i}`}>
+            {["Honda-trained technicians", "100% genuine spares", "Transparent pricing", "Same-day delivery", "Free pickup/drop within 5 km", "Real-time service status SMS"].map((t) => (
+              <div key={t} className="border border-gray-200 p-6 flex gap-3" data-testid={`why-${t.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`}>
                 <CheckCircle2 className="w-5 h-5 text-honda shrink-0" />
                 <div className="font-bold">{t}</div>
               </div>
