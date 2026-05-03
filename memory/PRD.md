@@ -36,7 +36,18 @@ Use Punjab Honda's actual content (Honda Motorcycle & Scooter India authorized d
 - ✅ **Frontend Pages**: Home (hero slider + quick actions + category strip + bike grid + services + testimonials + showrooms), BikesListing, BikeDetail, ServicesPage, ServiceBookingPage, InsurancePage, EmiCalculator, ContactPage, AdminPage.
 - ✅ **Components**: Header (sticky, utility bar, mobile menu), Footer, HeroSlider (3-slide auto-rotating), QuickActions (5 cards), BikeGrid (with category tabs), ServicesSection, Testimonials, ShowroomSection, EnquiryModal (reusable across 7 types).
 - ✅ **Theme**: Honda Red palette, Outfit + Manrope fonts via Google Fonts CDN, sharp edges, hover micro-animations, honda-stripe accent.
-- ✅ **Testing**: 33/33 backend pytest pass, 24/24 frontend Playwright flows pass.
+- ✅ **Testing**: 33/33 backend pytest pass, 17/17 frontend Playwright flows pass (after code-review fixes).
+
+## Code Quality Improvements (2026-01, post-review)
+- ✅ Admin token now uses **sessionStorage** instead of localStorage (smaller XSS attack window; clears on tab close).
+- ✅ Hardcoded test secret removed from `tests/test_punjab_honda.py`; loaded from env / backend `.env`.
+- ✅ Extracted `useAdminAuth` hook (`/hooks/useAdminAuth.js`) — fixes `useEffect` stale-closure risk in AdminPage.
+- ✅ Extracted `useEnquiryForm` hook (`/hooks/useEnquiryForm.js`) with custom email validation; form is `noValidate` so React validates first.
+- ✅ AdminPage refactored into `LoginForm`, `StatsRow`, `EnquiriesTable`, `Dashboard` subcomponents — cyclomatic complexity reduced ~70%.
+- ✅ EnquiryModal split into `SuccessScreen`, `ScheduleFields`, `BranchField`, `InsuranceFields`, `EnquiryFormBody` — main component now <50 lines.
+- ✅ Admin status updates are now **optimistic** (instant UI update, revert only on failure).
+- ✅ Replaced array-index `key` with stable identifiers (slide.tag, branch.name, testimonial.name, service.title, etc.) across HeroSlider, ShowroomSection, Testimonials, ServicesPage, ServicesSection.
+- ✅ `useMemo` added for table row rendering in admin dashboard.
 
 ## Test Credentials
 - Admin Token: `punjab-honda-admin-2026` (login at `/admin`)

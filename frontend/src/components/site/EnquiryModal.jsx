@@ -69,7 +69,7 @@ function InsuranceFields({ form, setField }) {
 
 function EnquiryFormBody({ type, vehicle, form, setField, submit, loading, error }) {
   return (
-    <form onSubmit={submit} className="p-6 space-y-4" data-testid="enquiry-form">
+    <form onSubmit={submit} noValidate className="p-6 space-y-4" data-testid="enquiry-form">
       <Field label="Full Name *" value={form.name} onChange={setField("name")} testid="enquiry-name-input" />
       <div className="grid grid-cols-2 gap-4">
         <Field label="Phone *" type="tel" value={form.phone} onChange={setField("phone")} testid="enquiry-phone-input" />
