@@ -1,0 +1,120 @@
+{
+  "project_name": "Punjab Honda Dealership",
+  "domain": "Automotive / E-commerce / Admin Dashboard",
+  "identity": {
+    "theme": "Light",
+    "archetype": "4 (Swiss & High-Contrast)",
+    "description": "A high-end, clean, and modern dealership website for Punjab Honda. It uses a stark, high-contrast palette anchored by the iconic Honda Red. The aesthetic is technical, trustworthy, and premium—eschewing standard 2010 dealership templates for a 'Performance Pro' meets 'Swiss Brutalism' feel. The focus is purely on the bikes (product is hero) and seamless user forms for inquiries/booking."
+  },
+  "typography": {
+    "strategy": "The 'Swiss Brutalist' (Tech/Art) - Bold technical sans for headings, highly legible clean sans for body and forms.",
+    "fonts": {
+      "headings": "Outfit, sans-serif",
+      "body": "Manrope, sans-serif",
+      "mono": "JetBrains Mono, monospace (for EMI calculator digits & specs)"
+    },
+    "scales": {
+      "h1": "text-4xl sm:text-5xl lg:text-6xl font-black tracking-tighter uppercase",
+      "h2": "text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight",
+      "h3": "text-xl sm:text-2xl font-bold",
+      "h4": "text-lg sm:text-xl font-semibold",
+      "body": "text-base leading-relaxed text-gray-700",
+      "small": "text-sm text-gray-500 font-medium uppercase tracking-[0.1em]"
+    },
+    "installation": "Ensure Outfit and Manrope are imported via Google Fonts."
+  },
+  "colors": {
+    "primary": {
+      "DEFAULT": "#E30613",
+      "hover": "#CC0000",
+      "foreground": "#FFFFFF"
+    },
+    "background": {
+      "DEFAULT": "#FFFFFF",
+      "secondary": "#F5F5F7",
+      "tertiary": "#EBEBEB"
+    },
+    "text": {
+      "DEFAULT": "#111111",
+      "muted": "#666666",
+      "inverse": "#FFFFFF"
+    },
+    "border": "#E5E7EB",
+    "status": {
+      "success": "#059669",
+      "warning": "#D97706",
+      "error": "#DC2626"
+    }
+  },
+  "spacing_and_layout": {
+    "philosophy": "Generous Spacing (Tailwind p-8 to p-24) to let the vehicles breathe. Dense, highly structured grids for the Admin Dashboard.",
+    "container": "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+    "grids": {
+      "marketing_hero": "grid-cols-1 lg:grid-cols-12 gap-8 with overlapping image and text elements",
+      "bento_quick_actions": "grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4",
+      "product_grid": "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6",
+      "admin_dashboard": "grid-cols-1 lg:grid-cols-12 gap-6 (Sidebar col-span-2, Main col-span-10)"
+    },
+    "radius": "rounded-none or rounded-sm (max 4px). Automotive design favors sharp, engineered edges over soft bubbles."
+  },
+  "components": {
+    "header": {
+      "style": "Sticky, solid white background with a crisp bottom border (border-gray-200). Utility bar at the very top (bg-gray-900 text-white text-xs py-2). Nav links are uppercase, font-bold, with a red underline animation on hover."
+    },
+    "buttons": {
+      "primary": "bg-[#E30613] text-white rounded-none uppercase tracking-wider font-bold hover:bg-[#CC0000] transition-colors px-6 py-3",
+      "secondary": "bg-gray-900 text-white rounded-none uppercase tracking-wider font-bold hover:bg-black transition-colors px-6 py-3",
+      "outline": "border-2 border-gray-900 text-gray-900 rounded-none uppercase tracking-wider font-bold hover:bg-gray-900 hover:text-white transition-all px-6 py-3"
+    },
+    "cards": {
+      "product": "Cardless design. A crisp border around a white/gray background (bg-[#F5F5F7]). Image takes 70% height, specs and CTA take 30%. On hover, subtle lift (-translate-y-1) and shadow-lg.",
+      "dashboard_widget": "Solid white background, 1px border-gray-200, sharp corners. Clear, large typography for KPIs."
+    },
+    "forms": {
+      "style": "Use Shadcn inputs but override to sharp corners (rounded-none). Focus state must be a sharp red ring (focus:ring-2 focus:ring-[#E30613] focus:ring-offset-2). Labels are uppercase, text-xs, font-bold, text-gray-500.",
+      "usage": "Use Shadcn Select for dropdowns, Calendar for dates."
+    }
+  },
+  "motion": {
+    "hover": "Fast, mechanical transitions (duration-150 ease-out). No slow, floaty animations.",
+    "page_load": "Staggered fade-up for product grids using Framer Motion.",
+    "hero": "Parallax effect on scroll for the hero background image."
+  },
+  "icons_and_assets": {
+    "library": "lucide-react (already installed) or @phosphor-icons/react (install if needed) for crisp, technical icons.",
+    "media": {
+      "hero_showroom": "https://images.unsplash.com/photo-1773940792913-94baf5fa0130?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1NDh8MHwxfHNlYXJjaHwxfHxtb3RvcmN5Y2xlJTIwc2hvd3Jvb20lMjBpbnRlcmlvcnxlbnwwfHx8fDE3Nzc4MDM1MDN8MA&ixlib=rb-4.1.0&q=85",
+      "hero_riding": "https://images.unsplash.com/photo-1714238886076-bb9841c1c974?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwyfHxob25kYSUyMG1vdG9yY3ljbGUlMjByaWRpbmd8ZW58MHx8fHwxNzc3ODAzNTAzfDA&ixlib=rb-4.1.0&q=85",
+      "service_mechanic": "https://images.unsplash.com/photo-1636761358757-0a616eb9e17e?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjAzMzN8MHwxfHNlYXJjaHwzfHxtb3RvcmN5Y2xlJTIwbWVjaGFuaWMlMjBzZXJ2aWNlfGVufDB8fHx8MTc3NzgwMzUwM3ww&ixlib=rb-4.1.0&q=85",
+      "products_placeholder": "https://images.unsplash.com/photo-1643350857443-8506888cf712?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHw0fHxob25kYSUyMG1vdG9yY3ljbGUlMjByaWRpbmd8ZW58MHx8fHwxNzc3ODAzNTAzfDA&ixlib=rb-4.1.0&q=85"
+    }
+  },
+  "pages_and_structure": {
+    "public_site": {
+      "top_utility_bar": "Contact info, Test Ride, On-Road Price",
+      "navigation": "Home, Motorcycles, Scooters, Big Wing, Services, Finance, Contact",
+      "hero": "Dynamic rotating slider featuring promotions and new launches",
+      "quick_actions": "Bento-style grid below hero for high-intent actions (Buy Online, Insurance, Service Booking)",
+      "vehicle_showcase": "Categorized tabs (Motorcycle, Scooter, EV) leading into grid of product cards",
+      "services_section": "Dark section (#111) showcasing after-sales services and AMC with 'service_mechanic' image",
+      "tools": "EMI Calculator embedded cleanly using range sliders and clear data visualization"
+    },
+    "admin_dashboard": {
+      "layout": "Left sidebar (fixed), top header with breadcrumbs and user profile, main content area",
+      "features": "Data tables for Enquiries (Test Ride, Price Quotes, Service). Filterable by date and status.",
+      "stats": "Top row KPI widgets (Total Enquiries Today, Pending Services, Active Insurance Renewals)"
+    }
+  },
+  "testing_rules": {
+    "data_testid": "ALL interactive elements (buttons, inputs, tabs, modal triggers) MUST have a data-testid attribute formatted as kebab-case based on role (e.g., 'test-ride-submit-button', 'nav-motorcycles-link')."
+  },
+  "instructions_to_main_agent": [
+    "Strictly follow the color palette. Do not use generic tailwind blue or indigo. The primary brand color is Honda Red (#E30613).",
+    "Use standard HTML tags for layout structures, use Shadcn purely for complex interactive logic like Select, Forms, Dialogs, Tabs.",
+    "Implement the 'Quick Actions' section as a highly visual, icon-driven grid directly below the hero.",
+    "For the EMI Calculator, use a clean slider interface and real-time calculation display.",
+    "Ensure all forms (Enquiry, Service, Insurance) are fully styled with sharp edges and clear error/success states.",
+    "For the vehicle images in the grid, if specific assets are missing, use the 'products_placeholder' image or stylized CSS shapes with the vehicle name to maintain the layout integrity.",
+    "Build a functional Admin Dashboard layout with a sidebar and Shadcn Table for managing enquiries."
+  ]
+}
