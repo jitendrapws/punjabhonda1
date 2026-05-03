@@ -26,19 +26,19 @@ export default function InsurancePage() {
     <>
       {/* Full-bleed header banner */}
       {bannerImg && (
-        <section className="relative h-[260px] sm:h-[340px] overflow-hidden" data-testid="insurance-header-banner">
+        <section className="relative h-[220px] sm:h-[300px] overflow-hidden" data-testid="insurance-header-banner">
           <img src={bannerImg} alt="Insurance" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/10" />
-          <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 h-full flex flex-col justify-end pb-12">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 lg:px-8 h-full flex flex-col justify-end pb-8">
             <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-honda">Two-Wheeler Insurance</div>
-            <h1 className="font-display font-black text-4xl sm:text-6xl uppercase tracking-tighter text-white mt-2 max-w-3xl leading-[0.95]">{bannerTitle}</h1>
+            <h1 className="font-display font-black text-4xl sm:text-5xl lg:text-6xl uppercase tracking-tighter text-white mt-2 max-w-3xl leading-[0.95]">{bannerTitle}</h1>
           </div>
         </section>
       )}
 
-      {/* Honda red strip with quick benefits */}
-      <section className="bg-gradient-to-br from-honda to-honda-dark text-white py-10" data-testid="insurance-benefits">
-        <div className="max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+      {/* Honda red strip with quick benefits — directly under banner, no big gap */}
+      <section className="bg-gradient-to-br from-honda to-honda-dark text-white py-8" data-testid="insurance-benefits">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8 grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <div>
             <p className="opacity-95 max-w-md text-base">{bannerSubtitle}</p>
           </div>
@@ -50,7 +50,7 @@ export default function InsurancePage() {
         </div>
       </section>
 
-      <section className="py-14 bg-white">
+      <section className="py-10 bg-white">
         <div className="max-w-3xl mx-auto px-4 lg:px-8">
           {status.ok ? (
             <div className="border-2 border-green-600 bg-green-50 p-10 text-center" data-testid="insurance-success">

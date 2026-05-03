@@ -5,6 +5,7 @@ import "@/App.css";
 import Header from "./components/site/Header";
 import Footer from "./components/site/Footer";
 import EnquiryModal from "./components/site/EnquiryModal";
+import WhatsAppWidget from "./components/site/WhatsAppWidget";
 
 import Home from "./pages/Home";
 import BikesListing from "./pages/BikesListing";
@@ -43,6 +44,7 @@ function App() {
         </main>
         <Footer />
         <EnquiryModal open={enquiry.open} onClose={closeEnquiry} type={enquiry.type} title={enquiry.title} vehicle={enquiry.vehicle} />
+        <WhatsAppWidget />
       </BrowserRouter>
     </div>
   );

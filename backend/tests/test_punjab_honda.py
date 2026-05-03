@@ -50,22 +50,25 @@ class TestRoot:
 
 # ---------- Bikes ----------
 class TestBikes:
-    def test_list_all_bikes_returns_21(self):
+    def test_list_all_bikes_returns_23(self):
         r = requests.get(f"{API}/bikes")
         assert r.status_code == 200
         bikes = r.json()
         assert isinstance(bikes, list)
-        assert len(bikes) == 21
+        assert len(bikes) == 23
         # validate structure
         b = bikes[0]
         for key in ("slug", "name", "category", "price_from", "engine", "power", "mileage", "description", "image"):
             assert key in b
+        # new fields
+        assert "color_options" in b
+        assert "specifications" in b
 
     def test_filter_motorcycle(self):
         r = requests.get(f"{API}/bikes", params={"category": "motorcycle"})
         assert r.status_code == 200
         bikes = r.json()
-        assert len(bikes) == 9
+        assert len(bikes) == 13
         assert all(b["category"] == "motorcycle" for b in bikes)
 
     def test_filter_scooter(self):
@@ -74,6 +77,8 @@ class TestBikes:
         bikes = r.json()
         assert len(bikes) == 4
         assert all(b["category"] == "scooter" for b in bikes)
+        slugs = {b["slug"] for b in bikes}
+        assert slugs == {"dio", "activa-6g", "activa-125", "dio-125"}
 
     def test_filter_ev(self):
         r = requests.get(f"{API}/bikes", params={"category": "ev"})
@@ -88,22 +93,40 @@ class TestBikes:
         r = requests.get(f"{API}/bikes", params={"category": "bigwing"})
         assert r.status_code == 200
         bikes = r.json()
-        assert len(bikes) == 6
+        assert len(bikes) == 4
         assert all(b["category"] == "bigwing" for b in bikes)
+        slugs = {b["slug"] for b in bikes}
+        assert slugs == {"nx500", "cb750-hornet", "xl750-transalp", "cb1000-hornet-sp"}
 
     def test_get_bike_by_slug_activa125(self):
         r = requests.get(f"{API}/bikes/activa-125")
         assert r.status_code == 200
         b = r.json()
         assert b["slug"] == "activa-125"
-        assert b["name"] == "Activa 125"
+        assert "Activa 125" in b["name"]
         assert b["category"] == "scooter"
 
-    def test_get_bike_by_slug_shine125(self):
-        r = requests.get(f"{API}/bikes/shine-125")
+    def test_get_bike_by_slug_shine100_has_colors_and_specs(self):
+        r = requests.get(f"{API}/bikes/shine-100")
         assert r.status_code == 200
         b = r.json()
-        assert b["slug"] == "shine-125"
+        assert b["slug"] == "shine-100"
+        assert isinstance(b["color_options"], list)
+        assert len(b["color_options"]) >= 3
+        assert isinstance(b["specifications"], dict)
+        assert len(b["specifications"]) >= 10
+        assert "Displacement" in b["specifications"]
+
+    def test_get_bike_activa_e_ev_specs(self):
+        r = requests.get(f"{API}/bikes/activa-e")
+        assert r.status_code == 200
+        b = r.json()
+        assert b["category"] == "ev"
+        specs = b["specifications"]
+        assert "Motor Type" in specs
+        assert "Battery" in specs
+        # Range key may be 'Range (IDC)' or similar
+        assert any("Range" in k for k in specs.keys())
 
     def test_get_bike_invalid_slug_404(self):
         r = requests.get(f"{API}/bikes/invalid-slug-xyz")

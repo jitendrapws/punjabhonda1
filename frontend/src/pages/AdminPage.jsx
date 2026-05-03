@@ -148,7 +148,7 @@ function Dashboard({ token, onLogout }) {
       title="Bikes"
       api={adminBikes}
       imageFolder="punjab-honda/bikes"
-      getNewItem={() => ({ slug: "", name: "", category: "motorcycle", price_from: 0, engine: "", power: "", mileage: "", description: "", image: "", sort_order: 0, active: true })}
+      getNewItem={() => ({ slug: "", name: "", category: "motorcycle", price_from: 0, engine: "", power: "", mileage: "", description: "", image: "", color_options: [], specifications: {}, sort_order: 0, active: true })}
       fields={[
         { key: "name", label: "Display Name", required: true },
         { key: "slug", label: "URL Slug (unique, lowercase, hyphens)", required: true, placeholder: "e.g. activa-125" },
@@ -162,6 +162,10 @@ function Dashboard({ token, onLogout }) {
         { key: "mileage", label: "Mileage (e.g. 55 kmpl)" },
         { key: "description", label: "Description", type: "textarea" },
         { key: "image", label: "Photo", type: "image" },
+        { key: "color_options", label: "Color Options (one per line)", type: "string-list",
+          helpText: "Enter each color name on a new line (e.g. Pearl Igneous Black)" },
+        { key: "specifications", label: "Technical Specifications (Key: Value per line)", type: "kv-map",
+          helpText: "Format: 'Displacement: 109.51 cc' — one entry per line" },
         { key: "sort_order", label: "Sort Order", type: "number" },
         { key: "active", label: "Visible", type: "boolean" },
       ]}

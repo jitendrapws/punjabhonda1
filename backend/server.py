@@ -83,6 +83,8 @@ class Bike(BaseModel):
     mileage: str = ""
     description: str = ""
     image: str = ""
+    color_options: List[str] = Field(default_factory=list)
+    specifications: Dict[str, str] = Field(default_factory=dict)
     sort_order: int = 0
     active: bool = True
 
@@ -97,6 +99,8 @@ class BikeUpsert(BaseModel):
     mileage: str = ""
     description: str = ""
     image: str = ""
+    color_options: List[str] = Field(default_factory=list)
+    specifications: Dict[str, str] = Field(default_factory=dict)
     sort_order: int = 0
     active: bool = True
 
@@ -140,29 +144,7 @@ class ServiceItem(BaseModel):
     active: bool = True
 
 # ---------- Initial Seed Data ----------
-SEED_BIKES = [
-    {"slug": "cb200x", "name": "CB200X", "category": "motorcycle", "price_from": 152000, "engine": "184.4 cc", "power": "17.03 bhp", "mileage": "42 kmpl", "description": "Adventure-ready styling with urban comfort. Built for the explorer in you.", "image": "https://images.unsplash.com/photo-1714238886076-bb9841c1c974?w=800&q=80"},
-    {"slug": "hornet-2-0", "name": "Hornet 2.0", "category": "motorcycle", "price_from": 139800, "engine": "184.4 cc", "power": "17.03 bhp", "mileage": "45 kmpl", "description": "Premium streetfighter with aggressive design and thrilling performance.", "image": "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80"},
-    {"slug": "livo", "name": "Livo", "category": "motorcycle", "price_from": 81000, "engine": "109.51 cc", "power": "8.79 bhp", "mileage": "65 kmpl", "description": "Stylish commuter with class-leading mileage and comfort.", "image": "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800&q=80"},
-    {"slug": "cd-110-dream", "name": "CD 110 Dream", "category": "motorcycle", "price_from": 71900, "engine": "109.51 cc", "power": "8.67 bhp", "mileage": "74 kmpl", "description": "Honda's most dependable commuter. Mileage ka baadshah.", "image": "https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=800&q=80"},
-    {"slug": "shine-125", "name": "Shine 125", "category": "motorcycle", "price_from": 81900, "engine": "123.94 cc", "power": "10.59 bhp", "mileage": "65 kmpl", "description": "India's No. 1 125cc motorcycle. Refined power. Smooth ride.", "image": "https://images.unsplash.com/photo-1558980394-dbb977039a2e?w=800&q=80"},
-    {"slug": "unicorn", "name": "Unicorn", "category": "motorcycle", "price_from": 112000, "engine": "162.71 cc", "power": "12.91 bhp", "mileage": "60 kmpl", "description": "Smooth, powerful, reliable. The gentleman's motorcycle.", "image": "https://images.unsplash.com/photo-1623083089636-42c6d9a1be30?w=800&q=80"},
-    {"slug": "sp-160", "name": "SP 160", "category": "motorcycle", "price_from": 120000, "engine": "162.71 cc", "power": "13.27 bhp", "mileage": "55 kmpl", "description": "Sporty performance meets everyday practicality.", "image": "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=800&q=80"},
-    {"slug": "sp-125", "name": "SP 125", "category": "motorcycle", "price_from": 86900, "engine": "123.94 cc", "power": "10.72 bhp", "mileage": "65 kmpl", "description": "India's first BS-VI motorcycle. Sporty, efficient, powerful.", "image": "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80"},
-    {"slug": "shine-100", "name": "Shine 100", "category": "motorcycle", "price_from": 64900, "engine": "98.98 cc", "power": "7.38 bhp", "mileage": "65 kmpl", "description": "The most affordable Honda motorcycle. Trust. Quality. Refinement.", "image": "https://images.unsplash.com/photo-1558981285-6f0c94958bb6?w=800&q=80"},
-    {"slug": "dio", "name": "Dio", "category": "scooter", "price_from": 71500, "engine": "109.51 cc", "power": "7.65 bhp", "mileage": "55 kmpl", "description": "Youthful styling. Keep Dio'ing it.", "image": "https://images.unsplash.com/photo-1609630875171-b1321377ee65?w=800&q=80"},
-    {"slug": "dio-125", "name": "Dio 125", "category": "scooter", "price_from": 88000, "engine": "123.92 cc", "power": "8.16 bhp", "mileage": "48 kmpl", "description": "Bold. Sporty. Faster. The premium youth scooter.", "image": "https://images.unsplash.com/photo-1571068316344-75bc76f77890?w=800&q=80"},
-    {"slug": "activa-125", "name": "Activa 125", "category": "scooter", "price_from": 85000, "engine": "123.92 cc", "power": "8.18 bhp", "mileage": "47 kmpl", "description": "Premium family scooter with H-Smart keyless experience.", "image": "https://images.unsplash.com/photo-1568708890-b4a9de8c7a40?w=800&q=80"},
-    {"slug": "activa-h-smart", "name": "Activa H-Smart", "category": "scooter", "price_from": 78000, "engine": "109.51 cc", "power": "7.75 bhp", "mileage": "55 kmpl", "description": "India's most trusted scooter. Now smarter with H-Smart key.", "image": "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=800&q=80"},
-    {"slug": "activa-e", "name": "Activa e:", "category": "ev", "price_from": 117000, "engine": "Electric (swappable battery)", "power": "6 kW", "mileage": "102 km/charge", "description": "Honda's first electric scooter for India. Zero emissions, pure Activa DNA.", "image": "https://images.unsplash.com/photo-1623083089636-42c6d9a1be30?w=800&q=80"},
-    {"slug": "qc1", "name": "QC1", "category": "ev", "price_from": 90000, "engine": "Electric (fixed battery)", "power": "1.8 kW", "mileage": "80 km/charge", "description": "Compact, efficient, affordable. Perfect city companion.", "image": "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=800&q=80"},
-    {"slug": "cbr650r", "name": "CBR 650R", "category": "bigwing", "price_from": 999000, "engine": "648.72 cc", "power": "86 bhp", "mileage": "21 kmpl", "description": "Inline-four sportbike. Track DNA for the street.", "image": "https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?w=800&q=80"},
-    {"slug": "cb650r", "name": "CB650R", "category": "bigwing", "price_from": 950000, "engine": "648.72 cc", "power": "86 bhp", "mileage": "21 kmpl", "description": "Neo Sports Cafe. Bold, authentic, refined.", "image": "https://images.unsplash.com/photo-1558980394-dbb977039a2e?w=800&q=80"},
-    {"slug": "cb1000r", "name": "CB1000R", "category": "bigwing", "price_from": 1450000, "engine": "998 cc", "power": "143 bhp", "mileage": "15 kmpl", "description": "Neo Sports Cafe flagship. Pure streetfighter aggression.", "image": "https://images.unsplash.com/photo-1623083089636-42c6d9a1be30?w=800&q=80"},
-    {"slug": "fireblade", "name": "CBR1000RR-R Fireblade", "category": "bigwing", "price_from": 2880000, "engine": "999.9 cc", "power": "215 bhp", "mileage": "13 kmpl", "description": "MotoGP technology. Track-bred superbike.", "image": "https://images.unsplash.com/photo-1591637333184-19aa84b3e01f?w=800&q=80"},
-    {"slug": "africa-twin", "name": "Africa Twin", "category": "bigwing", "price_from": 1699000, "engine": "1084 cc", "power": "100 bhp", "mileage": "18 kmpl", "description": "True adventure tourer. Conquer any terrain.", "image": "https://images.unsplash.com/photo-1714238886076-bb9841c1c974?w=800&q=80"},
-    {"slug": "gold-wing", "name": "Gold Wing", "category": "bigwing", "price_from": 3920000, "engine": "1833 cc", "power": "124 bhp", "mileage": "16 kmpl", "description": "The ultimate luxury tourer. Cross continents in comfort.", "image": "https://images.unsplash.com/photo-1558981806-ec527fa84c39?w=800&q=80"},
-]
+from seed_data import SEED_BIKES  # noqa: E402
 
 SEED_BRANCHES = [
     {"name": "Punjab Honda - Ashram Road (HO)", "address": "Near Gujarat Vidyapith, Ashram Road, Ahmedabad, Gujarat - 380014", "phone": "9925115151", "type": "showroom_service"},

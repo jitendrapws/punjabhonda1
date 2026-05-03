@@ -27,11 +27,11 @@ ADMIN_HEADERS = {"X-Admin-Token": ADMIN_TOKEN}
 
 # ---------- Public CMS GETs ----------
 class TestPublicCMS:
-    def test_bikes_returns_21_no_id(self):
+    def test_bikes_returns_23_no_id(self):
         r = requests.get(f"{API}/bikes")
         assert r.status_code == 200
         bikes = r.json()
-        assert len(bikes) == 21
+        assert len(bikes) == 23
         for b in bikes:
             assert "_id" not in b
             assert "slug" in b and "name" in b

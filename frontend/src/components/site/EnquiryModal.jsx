@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { X, Loader2, CheckCircle2 } from "lucide-react";
-import { submitEnquiry } from "../../lib/api";
+import { submitEnquiry, fetchBikes } from "../../lib/api";
 import useEnquiryForm from "../../hooks/useEnquiryForm";
 
 const TYPE_LABELS = {
@@ -67,7 +67,45 @@ function InsuranceFields({ form, setField }) {
   );
 }
 
-function EnquiryFormBody({ type, vehicle, form, setField, submit, loading, error }) {
+function VehicleDropdown({ form, setField, bikes }) {
+  const grouped = bikes.reduce((acc, b) => {
+    (acc[b.category] = acc[b.category] || []).push(b);
+    return acc;
+  }, {});
+  const labels = { motorcycle: "Motorcycles", scooter: "Scooters", ev: "Electric (EV)", bigwing: "Big Wing" };
+  const order = ["motorcycle", "scooter", "ev", "bigwing"];
+
+  const onChange = (e) => {
+    const slug = e.target.value;
+    const bike = bikes.find(b => b.slug === slug);
+    setField("vehicle_slug")({ target: { value: slug } });
+    setField("vehicle_name")({ target: { value: bike?.name || "" } });
+  };
+
+  return (
+    <div>
+      <Label>Select Honda Model *</Label>
+      <select
+        value={form.vehicle_slug || ""}
+        onChange={onChange}
+        className="w-full border border-gray-300 px-3 py-2.5 text-sm rounded-none bg-white focus:border-honda"
+        data-testid="enquiry-vehicle-select"
+      >
+        <option value="">— Pick a model —</option>
+        {order.filter(c => grouped[c]).map(c => (
+          <optgroup key={c} label={labels[c]}>
+            {grouped[c].map(b => (
+              <option key={b.slug} value={b.slug}>{b.name} — ₹{b.price_from.toLocaleString("en-IN")}</option>
+            ))}
+          </optgroup>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function EnquiryFormBody({ type, vehicle, form, setField, submit, loading, error, bikes }) {
+  const showVehicleDropdown = !vehicle && (type === "product_enquiry" || type === "quote" || type === "test_ride");
   return (
     <form onSubmit={submit} noValidate className="p-6 space-y-4" data-testid="enquiry-form">
       <Field label="Full Name *" value={form.name} onChange={setField("name")} testid="enquiry-name-input" />
@@ -84,9 +122,7 @@ function EnquiryFormBody({ type, vehicle, form, setField, submit, loading, error
       {type === "service_booking" && <BranchField form={form} setField={setField} />}
       {type === "insurance" && <InsuranceFields form={form} setField={setField} />}
 
-      {!vehicle && (type === "product_enquiry" || type === "quote" || type === "test_ride") && (
-        <Field label="Vehicle of Interest" value={form.vehicle_name} onChange={setField("vehicle_name")} testid="enquiry-vehicle-input" placeholder="e.g. Activa 125, Shine 125" />
-      )}
+      {showVehicleDropdown && <VehicleDropdown form={form} setField={setField} bikes={bikes} />}
 
       <div>
         <Label>Message / Requirement</Label>
@@ -110,6 +146,7 @@ function EnquiryFormBody({ type, vehicle, form, setField, submit, loading, error
 }
 
 export default function EnquiryModal({ open, onClose, type = "product_enquiry", title, vehicle }) {
+  const [bikes, setBikes] = useState([]);
   const { form, setField, submit, loading, success, error, reset } = useEnquiryForm({
     vehicle,
     onSubmit: (values) => submitEnquiry({ type, ...values }),
@@ -117,6 +154,13 @@ export default function EnquiryModal({ open, onClose, type = "product_enquiry", 
 
   // Reset whenever modal opens or vehicle changes
   useEffect(() => { if (open) reset(); }, [open, vehicle, reset]);
+
+  // Lazy-load bikes for the vehicle dropdown
+  useEffect(() => {
+    if (open && bikes.length === 0 && !vehicle) {
+      fetchBikes().then(setBikes).catch(() => {});
+    }
+  }, [open, vehicle, bikes.length]);
 
   if (!open) return null;
 
@@ -135,7 +179,7 @@ export default function EnquiryModal({ open, onClose, type = "product_enquiry", 
         {success ? (
           <SuccessScreen onClose={onClose} />
         ) : (
-          <EnquiryFormBody type={type} vehicle={vehicle} form={form} setField={setField} submit={submit} loading={loading} error={error} />
+          <EnquiryFormBody type={type} vehicle={vehicle} form={form} setField={setField} submit={submit} loading={loading} error={error} bikes={bikes} />
         )}
       </div>
     </div>

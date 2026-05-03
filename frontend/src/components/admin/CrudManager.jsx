@@ -153,6 +153,40 @@ export default function CrudManager({ token, title, api, fields, columns, getNew
                       testid={`crud-image-${f.key}`}
                     />
                   )}
+                  {f.type === "string-list" && (
+                    <textarea
+                      value={Array.isArray(editing[f.key]) ? editing[f.key].join("\n") : ""}
+                      onChange={(e) => setField(f.key, e.target.value.split("\n").map(s => s.trim()).filter(Boolean))}
+                      rows={5}
+                      placeholder="One value per line"
+                      className="w-full border border-gray-300 px-3 py-2 text-sm rounded-none font-mono"
+                      data-testid={`crud-field-${f.key}`}
+                    />
+                  )}
+                  {f.type === "kv-map" && (
+                    <textarea
+                      value={editing[f.key] && typeof editing[f.key] === "object"
+                        ? Object.entries(editing[f.key]).map(([k, v]) => `${k}: ${v}`).join("\n")
+                        : ""}
+                      onChange={(e) => {
+                        const obj = {};
+                        e.target.value.split("\n").forEach(line => {
+                          const idx = line.indexOf(":");
+                          if (idx > 0) {
+                            const k = line.slice(0, idx).trim();
+                            const v = line.slice(idx + 1).trim();
+                            if (k) obj[k] = v;
+                          }
+                        });
+                        setField(f.key, obj);
+                      }}
+                      rows={10}
+                      placeholder="Key: Value (one per line)"
+                      className="w-full border border-gray-300 px-3 py-2 text-sm rounded-none font-mono"
+                      data-testid={`crud-field-${f.key}`}
+                    />
+                  )}
+                  {f.helpText && <div className="text-[11px] text-gray-500 mt-1">{f.helpText}</div>}
                   {(f.type === "text" || f.type === "number" || !f.type) && (
                     <input
                       type={f.type === "number" ? "number" : "text"}

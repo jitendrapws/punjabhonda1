@@ -1,0 +1,39 @@
+{
+  "summary": "End-to-end testing of bike catalog refresh (23 models), color_options + specifications fields, EnquiryModal vehicle dropdown, WhatsApp widget, Home category-strip removal, and Insurance page gap fix. Backend: 61/61 pytest tests pass (incl. 3 new admin-CRUD tests for color_options + specifications and 8 updated public-bike tests). Frontend: bike detail page renders Color Options swatches + Full Specifications table with zebra rows; clicking a swatch updates 'Selected: <name>' header; 'Book Test Ride' header CTA opens modal with 'Select Honda Model' native <select> having 23 options in 4 <optgroup>s (Motorcycles, Scooters, Electric (EV), Big Wing); 'On-Road Price' CTA opens quote modal with same dropdown; Home no longer contains 'Buy New Two Wheeler' or 'World's Largest 2W Maker' text; Insurance page banner ends at y=413 and red benefits strip starts at y=413 — zero gap; WhatsApp floating button visible bottom-right, card opens with 'Punjab Honda' header and 'Start Chat' anchor, href = https://wa.me/919925115151?text=... as expected.",
+  "backend_issues": { "critical": [], "minor": [] },
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Insurance page banner", "issues": ["Banner H1 displays 'TEST_UPDATED_BANNER_1777807311' — leftover test data from previous iteration's site_settings.insurance_banner_title PATCH that wasn't reverted. Admin should restore to 'Insurance Made Easy' via /admin → Site Settings."]},
+      {"screen": "WhatsApp floating button", "issues": ["Button sits at bottom-5 right-5 which overlaps with the preview environment's 'Made with Emergent' badge in automated tests. In production (no Emergent badge) this is not an issue, but consider moving WA button slightly (e.g. bottom-20) if the Emergent badge remains."]}
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_punjab_honda.py",
+    "/app/backend/tests/test_bike_admin.py",
+    "/app/backend/tests/test_cms.py",
+    "/app/test_reports/pytest/iteration_5.xml"
+  ],
+  "action_items": [
+    "(Optional, minor) Admin: re-save Site Settings to restore insurance_banner_title to 'Insurance Made Easy' (currently 'TEST_UPDATED_BANNER_1777807311' from earlier iteration-4 test).",
+    "(Optional, minor) WhatsAppWidget: consider bottom-20 instead of bottom-5 to avoid overlapping with any vendor badge on preview."
+  ],
+  "critical_code_review_comments": [
+    "server.py PATCH admin bikes path accepts arbitrary Dict without Pydantic whitelist validation — an admin could $set any key on the bike doc. Admin-gated so risk is low, but recommend whitelisting to Bike.model_fields.",
+    "EnquiryModal.jsx VehicleDropdown: option renders `{c.name}` inside <option> which generates a React hydration warning ('<span> cannot be a child of <option>') ONLY because of the preview runtime's dev-tool instrumentation injecting <span> wrappers. Not a real production bug — production build would strip instrumentation. Still, explicit string coercion (`String(c.name)`) would be cleaner.",
+    "WhatsAppWidget.jsx: hardcoded fallback phone '9925115151' on fetchSiteSettings failure. Acceptable fallback but worth noting the phone number lives in two places (site_settings.sales_phone AND this fallback)."
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_punjab_honda.py (updated: 21→23 bikes, 9→13 motorcycles, 6→4 bigwing, new tests for shine-100 color/specs + activa-e EV specs)",
+    "/app/backend/tests/test_cms.py (updated: renamed test_bikes_returns_21_no_id → test_bikes_returns_23_no_id, assert len==23)",
+    "/app/backend/tests/test_bike_admin.py (NEW: 3 tests verifying admin create/update/delete with color_options + specifications)"
+  ],
+  "success_rate": { "backend": "100% (61/61)", "frontend": "100% on all 11 requested public/admin flows" },
+  "test_credentials": "Admin token: punjab-honda-admin-2026 (X-Admin-Token header)",
+  "seed_data_creation": "test_bike_admin.py creates and cleans up TEST_-prefixed bike with unique slug per run (full CRUD). No leftover data from this iteration.",
+  "retest_needed": false,
+  "should_main_agent_self_test": false,
+  "context_for_next_testing_agent": "Current bike catalog is 23 bikes with slugs: shine-100, shine-100-dx, livo, shine, sp-125, unicorn, cb125-hornet, sp160, hornet-2-0, cb300f-flex-fuel, nx200, cb350, cb350c, nx500, cb750-hornet, xl750-transalp, cb1000-hornet-sp, dio, activa-6g, activa-125, dio-125, activa-e, qc1. Every bike has color_options (list[str]) and specifications (dict[str,str]). EnquiryModal auto-fetches /api/bikes when opened without a 'vehicle' prop. WhatsApp widget reads phone from /api/site-settings (sales_phone) with fallback '9925115151'. Testids: whatsapp-widget (container), whatsapp-toggle-btn (FAB), whatsapp-card (expanded card), whatsapp-start-chat (anchor), whatsapp-close (X). To click the FAB in automated tests, use page.evaluate() JS click to bypass the preview-environment 'Made with Emergent' badge overlap at bottom-right.",
+  "rca_of_the_issue": "No production bugs found. The one Playwright 'failure' (WA card didn't open on first Playwright .click) was due to preview-environment's Emergent badge overlapping the WA button's hit area — bypassed with page.evaluate(JS click) which confirmed the widget behavior is correct end-to-end."
+}
