@@ -1,51 +1,48 @@
-import { useEffect } from "react";
-import "@/App.css";
+import { useState, useCallback } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import "@/App.css";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+import Header from "./components/site/Header";
+import Footer from "./components/site/Footer";
+import EnquiryModal from "./components/site/EnquiryModal";
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
-
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
-
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+import Home from "./pages/Home";
+import BikesListing from "./pages/BikesListing";
+import BikeDetail from "./pages/BikeDetail";
+import ServicesPage from "./pages/ServicesPage";
+import ServiceBookingPage from "./pages/ServiceBookingPage";
+import InsurancePage from "./pages/InsurancePage";
+import EmiCalculator from "./pages/EmiCalculator";
+import ContactPage from "./pages/ContactPage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
+  const [enquiry, setEnquiry] = useState({ open: false, type: "product_enquiry", title: "", vehicle: null });
+
+  const openEnquiry = useCallback((opts = {}) => {
+    setEnquiry({ open: true, type: opts.type || "product_enquiry", title: opts.title || "", vehicle: opts.vehicle || null });
+  }, []);
+  const closeEnquiry = useCallback(() => setEnquiry(e => ({ ...e, open: false })), []);
+
   return (
-    <div className="App">
+    <div className="App min-h-screen flex flex-col">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
+        <Header onOpenEnquiry={openEnquiry} />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home onOpenEnquiry={openEnquiry} />} />
+            <Route path="/bikes" element={<BikesListing onOpenEnquiry={openEnquiry} />} />
+            <Route path="/bikes/:slug" element={<BikeDetail onOpenEnquiry={openEnquiry} />} />
+            <Route path="/services" element={<ServicesPage onOpenEnquiry={openEnquiry} />} />
+            <Route path="/service-booking" element={<ServiceBookingPage />} />
+            <Route path="/insurance" element={<InsurancePage />} />
+            <Route path="/emi-calculator" element={<EmiCalculator onOpenEnquiry={openEnquiry} />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/admin" element={<AdminPage />} />
+          </Routes>
+        </main>
+        <Footer />
+        <EnquiryModal open={enquiry.open} onClose={closeEnquiry} type={enquiry.type} title={enquiry.title} vehicle={enquiry.vehicle} />
       </BrowserRouter>
     </div>
   );
