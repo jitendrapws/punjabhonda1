@@ -54,7 +54,7 @@ export default function Header({ onOpenEnquiry }) {
               <NavLink
                 key={item.to}
                 to={item.to}
-                className={`nav-link text-sm font-bold uppercase tracking-wider ${isActive ? "text-honda active" : "text-gray-900"}`}
+                className={`nav-link text-[12px] font-bold uppercase tracking-wider ${isActive ? "text-honda active" : "text-gray-900"}`}
                 data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-link`}
               >
                 {item.label}
