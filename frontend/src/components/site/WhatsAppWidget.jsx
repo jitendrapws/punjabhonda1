@@ -19,7 +19,7 @@ export default function WhatsAppWidget() {
   const link = `https://wa.me/${waNumber}?text=${defaultMsg}`;
 
   return (
-    <div className="fixed bottom-5 right-5 z-[90]" data-testid="whatsapp-widget">
+    <div className="fixed bottom-20 right-5 z-[90]" data-testid="whatsapp-widget">
       {open && (
         <div className="mb-3 bg-white border border-gray-200 shadow-2xl w-72 overflow-hidden animate-in" data-testid="whatsapp-card">
           <div className="bg-[#075E54] text-white p-4 flex items-start gap-3">

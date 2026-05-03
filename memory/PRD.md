@@ -49,7 +49,20 @@ Use Punjab Honda's actual content (Honda Motorcycle & Scooter India authorized d
 - ✅ Replaced array-index `key` with stable identifiers (slide.tag, branch.name, testimonial.name, service.title, etc.) across HeroSlider, ShowroomSection, Testimonials, ServicesPage, ServicesSection.
 - ✅ `useMemo` added for table row rendering in admin dashboard.
 
-## CMS Upgrade (2026-01)
+## Iteration 5 Updates (2026-01)
+- ✅ **Bike catalog refresh** — replaced 21 → **23 real Honda models** (per innovativehonda.com + honda2wheelersindia.com):
+  - Motorcycles (13): Shine 100, Shine 100 DX, Livo, Shine, SP 125, Unicorn, CB125 Hornet, SP160, Hornet 2.0, CB300F Flex-Fuel, NX200, CB350, CB350C
+  - Big Wing (4): NX500, CB750 Hornet, XL750 Transalp, CB1000 Hornet SP
+  - Scooters (4): Dio, Activa 6G, Activa 125, Dio 125
+  - EV (2): Activa e:, QC1 (per official Honda EV page)
+- ✅ Each bike has **color_options** (list of color names) and **specifications** (key-value dict with engine, displacement, power, torque, transmission, brakes, kerb weight, seat height, etc.)
+- ✅ **Bike Detail page** redesigned: added Color Options section (clickable swatches with color guess hex) + Full Specifications zebra table
+- ✅ **EnquiryModal**: test ride / quote / product enquiry forms now show **"Select Honda Model" dropdown** (grouped by category) when no vehicle is pre-filled
+- ✅ **Insurance page** gap fixed (banner h-340→300, py-14→10) — banner now flows directly into the red benefits strip
+- ✅ **Home page**: removed "Buy New Two Wheeler / Honda — World's Largest 2W Maker" category strip per user request
+- ✅ **WhatsApp click-to-chat widget** added (floating FAB bottom-right, expandable card, "Start Chat" link → wa.me with sales_phone from site settings)
+- ✅ **Admin Bikes form**: added textarea editors for `color_options` (one per line) and `specifications` (Key: Value per line)
+- ✅ Tests: 61/61 backend pass (3 new admin-CRUD tests for color/specs), 100% frontend flows pass
 - ✅ **Cloudinary integration** (signed uploads via backend, real account `dmtuyrkwy` verified end-to-end)
 - ✅ All static seed data (bikes, branches, hero slides, testimonials, services, site settings) **migrated to MongoDB** via idempotent `_seed_collection()` on app startup
 - ✅ Generic CRUD endpoints under `/api/admin/{resource}` (GET/POST/PATCH/DELETE) for: bikes, hero-slides, branches, testimonials, services
