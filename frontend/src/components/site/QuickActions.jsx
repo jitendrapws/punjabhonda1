@@ -19,7 +19,7 @@ export default function QuickActions({ onOpenEnquiry }) {
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {items.map((it, i) => {
+          {items.map((it) => {
             const Inner = (
               <div className="group border border-gray-200 bg-white p-6 h-full flex flex-col gap-3 hover:border-honda transition-colors" data-testid={`${it.testid}-card`}>
                 <div className="w-12 h-12 bg-gray-100 flex items-center justify-center group-hover:bg-honda group-hover:text-white transition-colors">
@@ -29,8 +29,8 @@ export default function QuickActions({ onOpenEnquiry }) {
                 <div className="text-xs text-gray-500">{it.sub}</div>
               </div>
             );
-            if (it.action) return <button key={i} onClick={it.action} className="text-left">{Inner}</button>;
-            return <Link key={i} to={it.to}>{Inner}</Link>;
+            if (it.action) return <button key={it.testid} onClick={it.action} className="text-left">{Inner}</button>;
+            return <Link key={it.testid} to={it.to}>{Inner}</Link>;
           })}
         </div>
       </div>

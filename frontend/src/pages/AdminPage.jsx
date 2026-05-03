@@ -22,6 +22,109 @@ const TABS = [
   { key: "settings", label: "Site Settings", icon: Settings },
 ];
 
+// ----- Module-level constants for CRUD panel configs -----
+// (Hoisted out of Dashboard component so React doesn't recreate these arrays each render)
+const CATEGORY_OPTIONS = [
+  { value: "motorcycle", label: "Motorcycle" }, { value: "scooter", label: "Scooter" },
+  { value: "ev", label: "Electric (EV)" }, { value: "bigwing", label: "Big Wing" },
+];
+
+const BRANCH_TYPE_OPTIONS = [
+  { value: "showroom_service", label: "Showroom + Service" },
+  { value: "showroom", label: "Showroom Only" },
+  { value: "service", label: "Service Only" },
+];
+
+const ICON_OPTIONS = ["Wrench", "ShieldCheck", "RefreshCw", "Truck", "Award", "Bell", "Bike"]
+  .map(i => ({ value: i, label: i }));
+
+const BIKE_FIELDS = [
+  { key: "name", label: "Display Name", required: true },
+  { key: "slug", label: "URL Slug (unique, lowercase, hyphens)", required: true, placeholder: "e.g. activa-125" },
+  { key: "category", label: "Category", type: "select", options: CATEGORY_OPTIONS },
+  { key: "price_from", label: "Ex-Showroom Price (₹)", type: "number" },
+  { key: "engine", label: "Engine (e.g. 109.51 cc)" },
+  { key: "power", label: "Power (e.g. 7.65 bhp)" },
+  { key: "mileage", label: "Mileage (e.g. 55 kmpl)" },
+  { key: "description", label: "Description", type: "textarea" },
+  { key: "image", label: "Photo", type: "image" },
+  { key: "color_options", label: "Color Options (one per line)", type: "string-list",
+    helpText: "Enter each color name on a new line (e.g. Pearl Igneous Black)" },
+  { key: "specifications", label: "Technical Specifications (Key: Value per line)", type: "kv-map",
+    helpText: "Format: 'Displacement: 109.51 cc' — one entry per line" },
+  { key: "sort_order", label: "Sort Order", type: "number" },
+  { key: "active", label: "Visible", type: "boolean" },
+];
+const BIKE_COLUMNS = [
+  { key: "image", label: "Photo" },
+  { key: "name", label: "Name" },
+  { key: "category", label: "Category" },
+  { key: "price_from", label: "Price", render: (b) => `₹${(b.price_from || 0).toLocaleString("en-IN")}` },
+  { key: "active", label: "Status" },
+];
+const NEW_BIKE = () => ({ slug: "", name: "", category: "motorcycle", price_from: 0, engine: "", power: "", mileage: "", description: "", image: "", color_options: [], specifications: {}, sort_order: 0, active: true });
+
+const HERO_FIELDS = [
+  { key: "tag", label: "Tag (small label above title)", required: true },
+  { key: "title", label: "Title (large heading)", required: true },
+  { key: "subtitle", label: "Subtitle", type: "textarea" },
+  { key: "accent", label: "Accent text (e.g. SAVE UPTO ₹8,000)" },
+  { key: "cta", label: "Button Label" },
+  { key: "cta_link", label: "Button Link", placeholder: "/bikes or /bikes/activa-125" },
+  { key: "image", label: "Banner Image (1600×600 recommended)", type: "image" },
+  { key: "sort_order", label: "Sort Order", type: "number" },
+  { key: "active", label: "Visible", type: "boolean" },
+];
+const HERO_COLUMNS = [
+  { key: "image", label: "Image" },
+  { key: "tag", label: "Tag" },
+  { key: "title", label: "Title" },
+  { key: "active", label: "Status" },
+];
+const NEW_HERO = () => ({ tag: "", title: "", subtitle: "", cta: "Explore", cta_link: "/bikes", image: "", accent: "", sort_order: 0, active: true });
+
+const BRANCH_FIELDS = [
+  { key: "name", label: "Branch Name", required: true },
+  { key: "address", label: "Address", type: "textarea" },
+  { key: "phone", label: "Phone" },
+  { key: "type", label: "Type", type: "select", options: BRANCH_TYPE_OPTIONS },
+  { key: "sort_order", label: "Sort Order", type: "number" },
+  { key: "active", label: "Visible", type: "boolean" },
+];
+const BRANCH_COLUMNS = [
+  { key: "name", label: "Name" }, { key: "type", label: "Type" },
+  { key: "phone", label: "Phone" }, { key: "active", label: "Status" },
+];
+const NEW_BRANCH = () => ({ name: "", address: "", phone: "", type: "showroom_service", sort_order: 0, active: true });
+
+const TESTIMONIAL_FIELDS = [
+  { key: "name", label: "Customer Name", required: true },
+  { key: "text", label: "Review Text", type: "textarea", rows: 4 },
+  { key: "rating", label: "Rating (1-5)", type: "number" },
+  { key: "sort_order", label: "Sort Order", type: "number" },
+  { key: "active", label: "Visible", type: "boolean" },
+];
+const TESTIMONIAL_COLUMNS = [
+  { key: "name", label: "Name" }, { key: "rating", label: "Rating" },
+  { key: "text", label: "Text" }, { key: "active", label: "Status" },
+];
+const NEW_TESTIMONIAL = () => ({ name: "", text: "", rating: 5, sort_order: 0, active: true });
+
+const SERVICE_FIELDS = [
+  { key: "title", label: "Service Title", required: true },
+  { key: "description", label: "Description", type: "textarea" },
+  { key: "icon", label: "Icon name (lucide)", type: "select", options: ICON_OPTIONS },
+  { key: "cta_label", label: "Button Label" },
+  { key: "cta_link", label: "Button Link" },
+  { key: "sort_order", label: "Sort Order", type: "number" },
+  { key: "active", label: "Visible", type: "boolean" },
+];
+const SERVICE_COLUMNS = [
+  { key: "title", label: "Title" }, { key: "icon", label: "Icon" },
+  { key: "description", label: "Description" }, { key: "active", label: "Status" },
+];
+const NEW_SERVICE = () => ({ title: "", description: "", icon: "Wrench", cta_label: "Know More", cta_link: "/contact", sort_order: 0, active: true });
+
 function LoginForm({ onSubmit }) {
   const [pwd, setPwd] = useState("");
   const [err, setErr] = useState("");
@@ -143,142 +246,24 @@ function Dashboard({ token, onLogout }) {
   const [tab, setTab] = useState("enquiries");
 
   const bikePanel = (
-    <CrudManager
-      token={token}
-      title="Bikes"
-      api={adminBikes}
-      imageFolder="punjab-honda/bikes"
-      getNewItem={() => ({ slug: "", name: "", category: "motorcycle", price_from: 0, engine: "", power: "", mileage: "", description: "", image: "", color_options: [], specifications: {}, sort_order: 0, active: true })}
-      fields={[
-        { key: "name", label: "Display Name", required: true },
-        { key: "slug", label: "URL Slug (unique, lowercase, hyphens)", required: true, placeholder: "e.g. activa-125" },
-        { key: "category", label: "Category", type: "select", options: [
-          { value: "motorcycle", label: "Motorcycle" }, { value: "scooter", label: "Scooter" },
-          { value: "ev", label: "Electric (EV)" }, { value: "bigwing", label: "Big Wing" },
-        ]},
-        { key: "price_from", label: "Ex-Showroom Price (₹)", type: "number" },
-        { key: "engine", label: "Engine (e.g. 109.51 cc)" },
-        { key: "power", label: "Power (e.g. 7.65 bhp)" },
-        { key: "mileage", label: "Mileage (e.g. 55 kmpl)" },
-        { key: "description", label: "Description", type: "textarea" },
-        { key: "image", label: "Photo", type: "image" },
-        { key: "color_options", label: "Color Options (one per line)", type: "string-list",
-          helpText: "Enter each color name on a new line (e.g. Pearl Igneous Black)" },
-        { key: "specifications", label: "Technical Specifications (Key: Value per line)", type: "kv-map",
-          helpText: "Format: 'Displacement: 109.51 cc' — one entry per line" },
-        { key: "sort_order", label: "Sort Order", type: "number" },
-        { key: "active", label: "Visible", type: "boolean" },
-      ]}
-      columns={[
-        { key: "image", label: "Photo" },
-        { key: "name", label: "Name" },
-        { key: "category", label: "Category" },
-        { key: "price_from", label: "Price", render: (b) => `₹${(b.price_from || 0).toLocaleString("en-IN")}` },
-        { key: "active", label: "Status" },
-      ]}
-    />
+    <CrudManager token={token} title="Bikes" api={adminBikes} imageFolder="punjab-honda/bikes"
+      getNewItem={NEW_BIKE} fields={BIKE_FIELDS} columns={BIKE_COLUMNS} />
   );
-
   const heroPanel = (
-    <CrudManager
-      token={token}
-      title="Hero Slides"
-      api={adminHeroSlides}
-      imageFolder="punjab-honda/hero"
-      getNewItem={() => ({ tag: "", title: "", subtitle: "", cta: "Explore", cta_link: "/bikes", image: "", accent: "", sort_order: 0, active: true })}
-      fields={[
-        { key: "tag", label: "Tag (small label above title)", required: true },
-        { key: "title", label: "Title (large heading)", required: true },
-        { key: "subtitle", label: "Subtitle", type: "textarea" },
-        { key: "accent", label: "Accent text (e.g. SAVE UPTO ₹8,000)" },
-        { key: "cta", label: "Button Label" },
-        { key: "cta_link", label: "Button Link", placeholder: "/bikes or /bikes/activa-125" },
-        { key: "image", label: "Banner Image (1600×600 recommended)", type: "image" },
-        { key: "sort_order", label: "Sort Order", type: "number" },
-        { key: "active", label: "Visible", type: "boolean" },
-      ]}
-      columns={[
-        { key: "image", label: "Image" },
-        { key: "tag", label: "Tag" },
-        { key: "title", label: "Title" },
-        { key: "active", label: "Status" },
-      ]}
-    />
+    <CrudManager token={token} title="Hero Slides" api={adminHeroSlides} imageFolder="punjab-honda/hero"
+      getNewItem={NEW_HERO} fields={HERO_FIELDS} columns={HERO_COLUMNS} />
   );
-
   const branchPanel = (
-    <CrudManager
-      token={token}
-      title="Branches"
-      api={adminBranches}
-      getNewItem={() => ({ name: "", address: "", phone: "", type: "showroom_service", sort_order: 0, active: true })}
-      fields={[
-        { key: "name", label: "Branch Name", required: true },
-        { key: "address", label: "Address", type: "textarea" },
-        { key: "phone", label: "Phone" },
-        { key: "type", label: "Type", type: "select", options: [
-          { value: "showroom_service", label: "Showroom + Service" },
-          { value: "showroom", label: "Showroom Only" },
-          { value: "service", label: "Service Only" },
-        ]},
-        { key: "sort_order", label: "Sort Order", type: "number" },
-        { key: "active", label: "Visible", type: "boolean" },
-      ]}
-      columns={[
-        { key: "name", label: "Name" },
-        { key: "type", label: "Type" },
-        { key: "phone", label: "Phone" },
-        { key: "active", label: "Status" },
-      ]}
-    />
+    <CrudManager token={token} title="Branches" api={adminBranches}
+      getNewItem={NEW_BRANCH} fields={BRANCH_FIELDS} columns={BRANCH_COLUMNS} />
   );
-
   const testimonialPanel = (
-    <CrudManager
-      token={token}
-      title="Testimonials"
-      api={adminTestimonials}
-      getNewItem={() => ({ name: "", text: "", rating: 5, sort_order: 0, active: true })}
-      fields={[
-        { key: "name", label: "Customer Name", required: true },
-        { key: "text", label: "Review Text", type: "textarea", rows: 4 },
-        { key: "rating", label: "Rating (1-5)", type: "number" },
-        { key: "sort_order", label: "Sort Order", type: "number" },
-        { key: "active", label: "Visible", type: "boolean" },
-      ]}
-      columns={[
-        { key: "name", label: "Name" },
-        { key: "rating", label: "Rating" },
-        { key: "text", label: "Text" },
-        { key: "active", label: "Status" },
-      ]}
-    />
+    <CrudManager token={token} title="Testimonials" api={adminTestimonials}
+      getNewItem={NEW_TESTIMONIAL} fields={TESTIMONIAL_FIELDS} columns={TESTIMONIAL_COLUMNS} />
   );
-
   const servicePanel = (
-    <CrudManager
-      token={token}
-      title="Services"
-      api={adminServices}
-      getNewItem={() => ({ title: "", description: "", icon: "Wrench", cta_label: "Know More", cta_link: "/contact", sort_order: 0, active: true })}
-      fields={[
-        { key: "title", label: "Service Title", required: true },
-        { key: "description", label: "Description", type: "textarea" },
-        { key: "icon", label: "Icon name (lucide)", type: "select", options: [
-          "Wrench", "ShieldCheck", "RefreshCw", "Truck", "Award", "Bell", "Bike",
-        ].map(i => ({ value: i, label: i })) },
-        { key: "cta_label", label: "Button Label" },
-        { key: "cta_link", label: "Button Link" },
-        { key: "sort_order", label: "Sort Order", type: "number" },
-        { key: "active", label: "Visible", type: "boolean" },
-      ]}
-      columns={[
-        { key: "title", label: "Title" },
-        { key: "icon", label: "Icon" },
-        { key: "description", label: "Description" },
-        { key: "active", label: "Status" },
-      ]}
-    />
+    <CrudManager token={token} title="Services" api={adminServices}
+      getNewItem={NEW_SERVICE} fields={SERVICE_FIELDS} columns={SERVICE_COLUMNS} />
   );
 
   return (

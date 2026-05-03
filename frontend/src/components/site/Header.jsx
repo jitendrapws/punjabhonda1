@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Phone, Menu, X, ChevronDown } from "lucide-react";
+import { Phone, Menu, X } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Home" },
@@ -14,9 +14,54 @@ const navItems = [
   { to: "/contact", label: "Contact" },
 ];
 
+function DesktopNav({ items, currentPath }) {
+  return (
+    <nav className="hidden lg:flex items-center gap-6">
+      {items.map((item) => {
+        const isActive = currentPath === item.to || (item.to === "/" && currentPath === "/");
+        return (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            className={`nav-link text-[12px] font-bold uppercase tracking-wider ${isActive ? "text-honda active" : "text-gray-900"}`}
+            data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-link`}
+          >
+            {item.label}
+          </NavLink>
+        );
+      })}
+    </nav>
+  );
+}
+
+function MobileNav({ items, onClose, onOpenEnquiry }) {
+  return (
+    <div className="lg:hidden border-t border-gray-200 bg-white">
+      <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3">
+        {items.map((item) => (
+          <NavLink
+            key={item.to}
+            to={item.to}
+            onClick={onClose}
+            className="text-sm font-bold uppercase tracking-wider text-gray-900 py-2 border-b border-gray-100"
+            data-testid={`mobile-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-link`}
+          >
+            {item.label}
+          </NavLink>
+        ))}
+        <div className="flex gap-2 mt-2">
+          <button onClick={() => { onClose(); onOpenEnquiry({ type: "quote", title: "Get On-Road Price" }); }} className="flex-1 bg-gray-900 text-white py-3 text-xs font-bold uppercase">On-Road Price</button>
+          <button onClick={() => { onClose(); onOpenEnquiry({ type: "test_ride", title: "Book Test Ride" }); }} className="flex-1 bg-honda text-white py-3 text-xs font-bold uppercase">Test Ride</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Header({ onOpenEnquiry }) {
   const [open, setOpen] = useState(false);
   const loc = useLocation();
+  const currentPath = loc.pathname + loc.search;
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200" data-testid="site-header">
@@ -47,21 +92,7 @@ export default function Header({ onOpenEnquiry }) {
           </div>
         </Link>
 
-        <nav className="hidden lg:flex items-center gap-6">
-          {navItems.map((item) => {
-            const isActive = loc.pathname + loc.search === item.to || (item.to === "/" && loc.pathname === "/");
-            return (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                className={`nav-link text-[12px] font-bold uppercase tracking-wider ${isActive ? "text-honda active" : "text-gray-900"}`}
-                data-testid={`nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-link`}
-              >
-                {item.label}
-              </NavLink>
-            );
-          })}
-        </nav>
+        <DesktopNav items={navItems} currentPath={currentPath} />
 
         <div className="hidden lg:flex items-center gap-3">
           <button
@@ -85,27 +116,7 @@ export default function Header({ onOpenEnquiry }) {
         </button>
       </div>
 
-      {open && (
-        <div className="lg:hidden border-t border-gray-200 bg-white">
-          <div className="max-w-7xl mx-auto px-4 py-4 flex flex-col gap-3">
-            {navItems.map((item) => (
-              <NavLink
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="text-sm font-bold uppercase tracking-wider text-gray-900 py-2 border-b border-gray-100"
-                data-testid={`mobile-nav-${item.label.toLowerCase().replace(/\s+/g, '-')}-link`}
-              >
-                {item.label}
-              </NavLink>
-            ))}
-            <div className="flex gap-2 mt-2">
-              <button onClick={() => { setOpen(false); onOpenEnquiry({ type: "quote", title: "Get On-Road Price" }); }} className="flex-1 bg-gray-900 text-white py-3 text-xs font-bold uppercase">On-Road Price</button>
-              <button onClick={() => { setOpen(false); onOpenEnquiry({ type: "test_ride", title: "Book Test Ride" }); }} className="flex-1 bg-honda text-white py-3 text-xs font-bold uppercase">Test Ride</button>
-            </div>
-          </div>
-        </div>
-      )}
+      {open && <MobileNav items={navItems} onClose={() => setOpen(false)} onOpenEnquiry={onOpenEnquiry} />}
     </header>
   );
 }

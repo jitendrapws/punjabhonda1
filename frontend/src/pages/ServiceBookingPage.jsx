@@ -4,6 +4,8 @@ import { submitEnquiry } from "../lib/api";
 
 const branches = ["Ashram Road (HO)", "Maninagar", "Bopal", "Naroda"];
 const slots = ["09:00", "10:00", "11:00", "12:00", "14:00", "15:00", "16:00", "17:00"];
+const BRANCH_OPTIONS = ["", ...branches];
+const SLOT_OPTIONS = ["", ...slots];
 
 export default function ServiceBookingPage() {
   const [form, setForm] = useState({ name: "", phone: "", email: "", vehicle_name: "", registration_number: "", branch: "", preferred_date: "", preferred_time: "", message: "" });
@@ -73,9 +75,9 @@ export default function ServiceBookingPage() {
                   <Input label="Email" type="email" value={form.email} onChange={handle("email")} testid="service-email" />
                   <Input label="Vehicle Model" value={form.vehicle_name} onChange={handle("vehicle_name")} testid="service-vehicle" placeholder="e.g. Activa 125" />
                   <Input label="Registration No." value={form.registration_number} onChange={handle("registration_number")} testid="service-reg" placeholder="GJ-01-XX-1234" />
-                  <Select label="Preferred Branch *" value={form.branch} onChange={handle("branch")} testid="service-branch" options={["", ...branches]} />
+                  <Select label="Preferred Branch *" value={form.branch} onChange={handle("branch")} testid="service-branch" options={BRANCH_OPTIONS} />
                   <Input label="Preferred Date *" type="date" value={form.preferred_date} onChange={handle("preferred_date")} testid="service-date" />
-                  <Select label="Preferred Time" value={form.preferred_time} onChange={handle("preferred_time")} testid="service-time" options={["", ...slots]} />
+                  <Select label="Preferred Time" value={form.preferred_time} onChange={handle("preferred_time")} testid="service-time" options={SLOT_OPTIONS} />
                 </div>
                 <div>
                   <Label>Issue / Notes</Label>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { X, Loader2, CheckCircle2 } from "lucide-react";
 import { submitEnquiry, fetchBikes } from "../../lib/api";
 import useEnquiryForm from "../../hooks/useEnquiryForm";
@@ -67,13 +67,14 @@ function InsuranceFields({ form, setField }) {
   );
 }
 
+const CATEGORY_ORDER = ["motorcycle", "scooter", "ev", "bigwing"];
+const CATEGORY_LABELS = { motorcycle: "Motorcycles", scooter: "Scooters", ev: "Electric (EV)", bigwing: "Big Wing" };
+
 function VehicleDropdown({ form, setField, bikes }) {
-  const grouped = bikes.reduce((acc, b) => {
+  const grouped = useMemo(() => bikes.reduce((acc, b) => {
     (acc[b.category] = acc[b.category] || []).push(b);
     return acc;
-  }, {});
-  const labels = { motorcycle: "Motorcycles", scooter: "Scooters", ev: "Electric (EV)", bigwing: "Big Wing" };
-  const order = ["motorcycle", "scooter", "ev", "bigwing"];
+  }, {}), [bikes]);
 
   const onChange = (e) => {
     const slug = e.target.value;
@@ -92,8 +93,8 @@ function VehicleDropdown({ form, setField, bikes }) {
         data-testid="enquiry-vehicle-select"
       >
         <option value="">— Pick a model —</option>
-        {order.filter(c => grouped[c]).map(c => (
-          <optgroup key={c} label={labels[c]}>
+        {CATEGORY_ORDER.filter(c => grouped[c]).map(c => (
+          <optgroup key={c} label={CATEGORY_LABELS[c]}>
             {grouped[c].map(b => (
               <option key={b.slug} value={b.slug}>{b.name} — ₹{b.price_from.toLocaleString("en-IN")}</option>
             ))}
