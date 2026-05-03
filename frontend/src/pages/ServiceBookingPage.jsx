@@ -98,9 +98,9 @@ export default function ServiceBookingPage() {
 
 const Label = ({ children }) => <label className="block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-500 mb-1.5">{children}</label>;
 const Input = ({ label, testid, ...p }) => (<div><Label>{label}</Label><input {...p} className="w-full border border-gray-300 px-3 py-2.5 text-sm rounded-none" data-testid={testid} /></div>);
-const Select = ({ label, options, testid, ...p }) => (
+const Select = ({ label, options, testid, value, onChange }) => (
   <div><Label>{label}</Label>
-    <select {...p} className="w-full border border-gray-300 px-3 py-2.5 text-sm rounded-none bg-white" data-testid={testid}>
+    <select value={value} onChange={onChange} className="w-full border border-gray-300 px-3 py-2.5 text-sm rounded-none bg-white" data-testid={testid}>
       {options.map(o => <option key={o} value={o}>{o || "Select..."}</option>)}
     </select>
   </div>
