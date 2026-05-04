@@ -7,10 +7,17 @@ const initialState = {
   policy_number: "", registration_number: "",
 };
 
-/**
- * Custom hook to manage enquiry form state, validation and submission.
- * Reduces EnquiryModal complexity by isolating form-handling logic.
- */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/** Pure validation function — easier to test and reason about. */
+function validateEnquiryForm(form) {
+  if (!form.name.trim()) return "Name is required";
+  if (!form.phone.trim()) return "Phone is required";
+  if (form.email && !EMAIL_RE.test(form.email)) return "Invalid email";
+  return null;
+}
+
+/** Custom hook: isolates enquiry form state, validation and submission logic. */
 export default function useEnquiryForm({ vehicle, onSubmit }) {
   const [form, setForm] = useState({
     ...initialState,
@@ -36,17 +43,10 @@ export default function useEnquiryForm({ vehicle, onSubmit }) {
     setForm((prev) => ({ ...prev, [key]: e.target.value }));
   }, []);
 
-  const validate = useCallback(() => {
-    if (!form.name.trim()) return "Name is required";
-    if (!form.phone.trim()) return "Phone is required";
-    if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return "Invalid email";
-    return null;
-  }, [form.name, form.phone, form.email]);
-
   const submit = useCallback(async (e) => {
     e.preventDefault();
     setError("");
-    const errMsg = validate();
+    const errMsg = validateEnquiryForm(form);
     if (errMsg) { setError(errMsg); return; }
     setLoading(true);
     try {
@@ -57,8 +57,10 @@ export default function useEnquiryForm({ vehicle, onSubmit }) {
     } finally {
       setLoading(false);
     }
-  }, [form, validate, onSubmit]);
+  }, [form, onSubmit]);
 
-  const helpers = useMemo(() => ({ form, setField, submit, loading, success, error, reset }), [form, setField, submit, loading, success, error, reset]);
-  return helpers;
+  return useMemo(
+    () => ({ form, setField, submit, loading, success, error, reset }),
+    [form, setField, submit, loading, success, error, reset]
+  );
 }
