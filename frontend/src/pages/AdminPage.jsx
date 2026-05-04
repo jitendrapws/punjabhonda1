@@ -126,23 +126,64 @@ const SERVICE_COLUMNS = [
 const NEW_SERVICE = () => ({ title: "", description: "", icon: "Wrench", cta_label: "Know More", cta_link: "/contact", sort_order: 0, active: true });
 
 function LoginForm({ onSubmit }) {
-  const [pwd, setPwd] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const handle = async (e) => {
-    e.preventDefault(); setErr("");
-    const ok = await onSubmit(pwd);
-    if (!ok) setErr("Invalid token");
+    e.preventDefault();
+    setErr("");
+    setLoading(true);
+    try {
+      await onSubmit(email, password);
+    } catch (ex) {
+      setErr(ex?.response?.data?.detail || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center bg-[#F5F5F7] py-12">
       <form onSubmit={handle} className="bg-white border border-gray-200 p-8 w-full max-w-md" data-testid="admin-login-form">
         <ShieldCheck className="w-10 h-10 text-honda" />
         <h1 className="font-display font-black text-3xl uppercase tracking-tight mt-3">Admin Access</h1>
-        <p className="text-sm text-gray-600 mt-1">Enter your admin token to manage the site.</p>
-        <label className="block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-500 mt-6 mb-1.5">Admin Token</label>
-        <input type="password" value={pwd} onChange={e => setPwd(e.target.value)} className="w-full border border-gray-300 px-3 py-3 text-sm rounded-none" data-testid="admin-token-input" />
-        {err && <div className="text-sm text-red-600 mt-2" data-testid="admin-login-error">{err}</div>}
-        <button type="submit" className="mt-5 w-full bg-honda text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-honda-dark" data-testid="admin-login-btn">Sign In</button>
+        <p className="text-sm text-gray-600 mt-1">Sign in to manage the Punjab Honda site.</p>
+
+        <label className="block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-500 mt-6 mb-1.5">Email</label>
+        <input
+          type="email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          autoComplete="username"
+          className="w-full border border-gray-300 px-3 py-3 text-sm rounded-none"
+          data-testid="admin-email-input"
+          required
+        />
+
+        <label className="block text-[10px] font-bold uppercase tracking-[0.1em] text-gray-500 mt-4 mb-1.5">Password</label>
+        <input
+          type="password"
+          value={password}
+          onChange={e => setPassword(e.target.value)}
+          autoComplete="current-password"
+          className="w-full border border-gray-300 px-3 py-3 text-sm rounded-none"
+          data-testid="admin-password-input"
+          required
+        />
+
+        {err && <div className="text-sm text-red-600 mt-3" data-testid="admin-login-error">{err}</div>}
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-5 w-full bg-honda text-white py-3.5 text-xs font-bold uppercase tracking-wider hover:bg-honda-dark disabled:opacity-60 flex items-center justify-center gap-2"
+          data-testid="admin-login-btn"
+        >
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+          {loading ? "Signing In..." : "Sign In"}
+        </button>
       </form>
     </div>
   );
@@ -242,7 +283,7 @@ function EnquiriesPanel({ token }) {
   );
 }
 
-function Dashboard({ token, onLogout }) {
+function Dashboard({ token, user, onLogout }) {
   const [tab, setTab] = useState("enquiries");
 
   const bikePanel = (
@@ -273,6 +314,7 @@ function Dashboard({ token, onLogout }) {
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.2em] text-honda">Punjab Honda</div>
             <h1 className="font-display font-black text-3xl uppercase tracking-tight">Admin Dashboard</h1>
+            {user?.email && <div className="text-xs text-gray-500 mt-1" data-testid="admin-user-email">Signed in as <span className="font-bold">{user.email}</span></div>}
           </div>
           <button onClick={onLogout} className="bg-gray-900 text-white px-4 py-2 text-xs font-bold uppercase flex items-center gap-2" data-testid="admin-logout"><LogOut className="w-4 h-4" /> Logout</button>
         </div>
@@ -311,10 +353,10 @@ function Dashboard({ token, onLogout }) {
 }
 
 export default function AdminPage() {
-  const { token, authed, checking, verify, logout } = useAdminAuth();
+  const { token, user, authed, checking, login, logout } = useAdminAuth();
   if (checking) return <div className="min-h-[60vh] flex items-center justify-center" data-testid="admin-checking"><Loader2 className="w-6 h-6 animate-spin text-honda" /></div>;
-  if (!authed) return <LoginForm onSubmit={verify} />;
-  return <Dashboard token={token} onLogout={logout} />;
+  if (!authed) return <LoginForm onSubmit={login} />;
+  return <Dashboard token={token} user={user} onLogout={logout} />;
 }
 
 const Kpi = ({ label, value, accent }) => (

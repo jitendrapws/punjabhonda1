@@ -13,7 +13,7 @@ export const API = `${BACKEND_URL || ""}/api`;
 
 export const api = axios.create({ baseURL: API });
 
-const adminHeaders = (token) => ({ headers: { "X-Admin-Token": token } });
+const adminHeaders = (token) => ({ headers: { "Authorization": `Bearer ${token}` } });
 
 // Public
 export const submitEnquiry = (payload) => api.post("/enquiries", payload).then(r => r.data);
@@ -26,6 +26,12 @@ export const fetchServices = () => api.get("/services").then(r => r.data);
 export const fetchSiteSettings = () => api.get("/site-settings").then(r => r.data);
 
 // Admin: auth
+export const adminLogin = (email, password) => api.post("/admin/auth/login", { email, password }).then(r => r.data);
+export const adminMe = (token) => api.get("/admin/auth/me", adminHeaders(token)).then(r => r.data);
+export const adminChangePassword = (token, current_password, new_password) =>
+  api.post("/admin/auth/change-password", { current_password, new_password }, adminHeaders(token)).then(r => r.data);
+
+// Legacy verify (accepts JWT or X-Admin-Token) — retained for backward compat
 export const verifyAdmin = (token) => api.post("/admin/verify", {}, adminHeaders(token)).then(r => r.data);
 export const fetchEnquiries = (token, params = {}) => api.get("/admin/enquiries", { ...adminHeaders(token), params }).then(r => r.data);
 export const fetchStats = (token) => api.get("/admin/stats", adminHeaders(token)).then(r => r.data);

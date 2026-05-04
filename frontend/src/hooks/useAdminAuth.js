@@ -1,47 +1,45 @@
 import { useState, useEffect, useCallback } from "react";
-import { verifyAdmin } from "../lib/api";
+import { adminLogin, adminMe } from "../lib/api";
 
 const STORAGE_KEY = "ph_admin_token";
-// sessionStorage is cleared when the tab closes — much smaller XSS attack window
-// than localStorage, and adequate for an MVP single-token admin gate.
 const storage = typeof window !== "undefined" ? window.sessionStorage : null;
 
 export default function useAdminAuth() {
   const [token, setToken] = useState(() => storage?.getItem(STORAGE_KEY) || "");
+  const [user, setUser] = useState(null);
   const [authed, setAuthed] = useState(false);
   const [checking, setChecking] = useState(!!token);
-
-  const persist = useCallback((t) => {
-    storage?.setItem(STORAGE_KEY, t);
-    setToken(t);
-    setAuthed(true);
-  }, []);
 
   const clear = useCallback(() => {
     storage?.removeItem(STORAGE_KEY);
     setToken("");
+    setUser(null);
     setAuthed(false);
   }, []);
 
-  const verify = useCallback(async (t) => {
+  /** Log in with email + password. Returns true on success. */
+  const login = useCallback(async (email, password) => {
     try {
-      await verifyAdmin(t);
-      persist(t);
+      const { token: t, user: u } = await adminLogin(email, password);
+      storage?.setItem(STORAGE_KEY, t);
+      setToken(t);
+      setUser(u);
+      setAuthed(true);
       return true;
-    } catch {
+    } catch (e) {
       clear();
-      return false;
+      throw e;
     }
-  }, [persist, clear]);
+  }, [clear]);
 
-  // On mount: silently verify any existing token
+  // On mount: silently validate any existing token
   useEffect(() => {
     let cancelled = false;
     if (!token) return;
     (async () => {
       try {
-        await verifyAdmin(token);
-        if (!cancelled) setAuthed(true);
+        const me = await adminMe(token);
+        if (!cancelled) { setUser(me); setAuthed(true); }
       } catch {
         if (!cancelled) clear();
       } finally {
@@ -52,5 +50,5 @@ export default function useAdminAuth() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return { token, authed, checking, verify, logout: clear };
+  return { token, user, authed, checking, login, logout: clear };
 }

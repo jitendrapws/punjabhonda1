@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Header, Query
+from fastapi import FastAPI, APIRouter, HTTPException, Header, Query, Depends
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,7 +6,7 @@ import os
 import time
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional, Literal, Any, Dict
 import uuid
 from datetime import datetime, timezone
@@ -16,6 +16,11 @@ import cloudinary.uploader
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+from auth import (  # noqa: E402
+    authenticate, create_access_token, require_admin, seed_admin,
+    hash_password, verify_password,
+)
 
 # MongoDB
 mongo_url = os.environ['MONGO_URL']
@@ -222,11 +227,16 @@ async def seed_db():
     if not await db.site_settings.find_one({"_id": "site"}):
         await db.site_settings.insert_one(DEFAULT_SETTINGS)
         seeded["site_settings"] = 1
+    # Admin user seed (from ADMIN_EMAIL / ADMIN_PASSWORD env)
+    await seed_admin(db)
+    # Index on admin email
+    await db.admin_users.create_index("email", unique=True)
     logger.info(f"Seed result: {seeded}")
 
 
-def _check_admin(token: Optional[str]):
-    if token != ADMIN_TOKEN:
+def _check_admin(token):  # Retained for backward-compat in any external callers
+    """DEPRECATED: Use `require_admin` FastAPI dependency instead."""
+    if token != os.environ.get("ADMIN_TOKEN"):
         raise HTTPException(status_code=401, detail="Unauthorized")
 
 
@@ -296,19 +306,61 @@ async def create_enquiry(payload: EnquiryCreate):
 
 
 # ---------- Admin: Auth ----------
-@api_router.post("/admin/verify")
-async def verify_admin(x_admin_token: Optional[str] = Header(default=None)):
-    _check_admin(x_admin_token)
+class LoginRequest(BaseModel):
+    email: EmailStr
+    password: str
+
+class ChangePasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
+@api_router.post("/admin/auth/login")
+async def admin_login(payload: LoginRequest):
+    user = await authenticate(db, payload.email, payload.password)
+    if not user:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    token = create_access_token(user["id"], user["email"])
+    return {"token": token, "user": user}
+
+
+@api_router.get("/admin/auth/me")
+async def admin_me(admin: dict = Depends(require_admin)):
+    return admin
+
+
+@api_router.post("/admin/auth/change-password")
+async def admin_change_password(
+    payload: ChangePasswordRequest,
+    admin: dict = Depends(require_admin),
+):
+    email = admin.get("email")
+    if not email or email == "legacy@admin":
+        raise HTTPException(status_code=400, detail="Legacy token cannot change password. Login via email first.")
+    user = await db.admin_users.find_one({"email": email})
+    if not user or not verify_password(payload.current_password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+    if len(payload.new_password) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters")
+    await db.admin_users.update_one(
+        {"email": email},
+        {"$set": {"password_hash": hash_password(payload.new_password)}},
+    )
     return {"ok": True}
+
+
+@api_router.post("/admin/verify")
+async def verify_admin(admin: dict = Depends(require_admin)):
+    """Legacy verify endpoint — returns ok if token (JWT or X-Admin-Token) is valid."""
+    return {"ok": True, "admin": admin}
 
 
 # ---------- Admin: Cloudinary signature ----------
 @api_router.get("/admin/cloudinary/signature")
 async def cloudinary_signature(
     folder: str = Query("punjab-honda/uploads"),
-    x_admin_token: Optional[str] = Header(default=None),
+    admin: dict = Depends(require_admin),
 ):
-    _check_admin(x_admin_token)
     if not folder.startswith("punjab-honda/"):
         raise HTTPException(status_code=400, detail="Invalid folder")
     timestamp = int(time.time())
@@ -326,11 +378,10 @@ async def cloudinary_signature(
 # ---------- Admin: Enquiries ----------
 @api_router.get("/admin/enquiries")
 async def list_enquiries(
-    x_admin_token: Optional[str] = Header(default=None),
     type: Optional[str] = None,
     status: Optional[str] = None,
+    admin: dict = Depends(require_admin),
 ):
-    _check_admin(x_admin_token)
     q = {}
     if type:
         q["type"] = type
@@ -341,8 +392,7 @@ async def list_enquiries(
 
 
 @api_router.get("/admin/stats")
-async def admin_stats(x_admin_token: Optional[str] = Header(default=None)):
-    _check_admin(x_admin_token)
+async def admin_stats(admin: dict = Depends(require_admin)):
     total = await db.enquiries.count_documents({})
     new = await db.enquiries.count_documents({"status": "new"})
     today_start = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
@@ -357,9 +407,8 @@ async def admin_stats(x_admin_token: Optional[str] = Header(default=None)):
 async def update_enquiry_status(
     enquiry_id: str,
     body: StatusUpdate,
-    x_admin_token: Optional[str] = Header(default=None),
+    admin: dict = Depends(require_admin),
 ):
-    _check_admin(x_admin_token)
     result = await db.enquiries.update_one({"id": enquiry_id}, {"$set": {"status": body.status}})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Not found")
@@ -368,19 +417,16 @@ async def update_enquiry_status(
 
 # ---------- Admin: Generic CRUD factory ----------
 def _make_crud(coll_name: str, model_cls):
-    async def list_all(x_admin_token: Optional[str] = Header(default=None)):
-        _check_admin(x_admin_token)
+    async def list_all(admin: dict = Depends(require_admin)):
         return await db[coll_name].find({}, {"_id": 0}).sort("sort_order", 1).to_list(1000)
 
-    async def create(payload: Dict[str, Any], x_admin_token: Optional[str] = Header(default=None)):
-        _check_admin(x_admin_token)
+    async def create(payload: Dict[str, Any], admin: dict = Depends(require_admin)):
         obj = model_cls(**payload)
         doc = obj.model_dump()
         await db[coll_name].insert_one(doc)
         return _strip_id(doc)
 
-    async def update(item_id: str, payload: Dict[str, Any], x_admin_token: Optional[str] = Header(default=None)):
-        _check_admin(x_admin_token)
+    async def update(item_id: str, payload: Dict[str, Any], admin: dict = Depends(require_admin)):
         payload.pop("id", None)
         result = await db[coll_name].update_one({"id": item_id}, {"$set": payload})
         if result.matched_count == 0:
@@ -388,8 +434,7 @@ def _make_crud(coll_name: str, model_cls):
         doc = await db[coll_name].find_one({"id": item_id}, {"_id": 0})
         return doc
 
-    async def delete(item_id: str, x_admin_token: Optional[str] = Header(default=None)):
-        _check_admin(x_admin_token)
+    async def delete(item_id: str, admin: dict = Depends(require_admin)):
         result = await db[coll_name].delete_one({"id": item_id})
         if result.deleted_count == 0:
             raise HTTPException(status_code=404, detail="Not found")
@@ -418,9 +463,8 @@ _register_crud("services", "services", ServiceItem)
 @api_router.patch("/admin/site-settings")
 async def update_site_settings(
     payload: Dict[str, Any],
-    x_admin_token: Optional[str] = Header(default=None),
+    admin: dict = Depends(require_admin),
 ):
-    _check_admin(x_admin_token)
     payload.pop("_id", None)
     await db.site_settings.update_one({"_id": "site"}, {"$set": payload}, upsert=True)
     s = await db.site_settings.find_one({"_id": "site"})
